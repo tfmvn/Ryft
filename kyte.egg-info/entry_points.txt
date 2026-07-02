@@ -1,0 +1,2 @@
+[console_scripts]
+kyte = kyte.__main__:main
