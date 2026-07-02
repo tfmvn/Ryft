@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kyte"
+version = "1.0.0"
+description = "A calm, fast terminal companion for git — AI commit messages, live sync, and one-command onboarding."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Kyte" }]
+keywords = ["cli", "git", "ai", "developer-tools", "ollama"]
+classifiers = [
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Software Development :: Version Control :: Git",
+]
+dependencies = [
+    "prompt-toolkit>=3.0",
+    "rich>=13.0",
+    "watchdog>=3.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/kyte-dev/kyte"
+
+[project.scripts]
+kyte = "kyte.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["kyte*"]
