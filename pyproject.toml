@@ -8,16 +8,29 @@ dynamic = ["version"]
 description = "A calm, fast terminal companion for git — AI commit messages, live sync, and one-command onboarding."
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "MIT" }
-authors = [{ name = "Ryft" }]
-keywords = ["cli", "git", "ai", "developer-tools", "ollama"]
+
+license = "MIT"
+license-files = ["LICENSE"]
+
+authors = [
+    { name = "Aman [tfmvn - github]" }
+]
+
+keywords = [
+    "cli",
+    "git",
+    "ai",
+    "developer-tools",
+    "ollama"
+]
+
 classifiers = [
     "Environment :: Console",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Topic :: Software Development :: Version Control :: Git",
 ]
+
 dependencies = [
     "prompt-toolkit>=3.0",
     "rich>=13.0",
@@ -25,11 +38,13 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8.0"]
+dev = [
+    "pytest>=8.0",
+]
 
 [project.urls]
-Homepage = "https://github.com/ryft-dev/ryft"
-Issues = "https://github.com/ryft-dev/ryft/issues"
+Homepage = "https://github.com/tfmvn/Ryft"
+Issues = "https://github.com/tfmvn/Ryft/issues"
 
 [project.scripts]
 ryft = "ryft.__main__:main"
