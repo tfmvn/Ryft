@@ -45,11 +45,13 @@ SYSTEM_REVIEW = (
 
 # ── Error ─────────────────────────────────────────────────────────────────────
 
+
 class OllamaError(Exception):
     pass
 
 
 # ── Client ────────────────────────────────────────────────────────────────────
+
 
 @dataclass
 class OllamaClient:
@@ -62,9 +64,9 @@ class OllamaClient:
             "model": self.model,
             "prompt": prompt,
             "stream": False,
-            "think": False,          # disable chain-of-thought / reasoning
+            "think": False,  # disable chain-of-thought / reasoning
             "options": {
-                "num_predict": 80,   # commit messages are short — cap tokens hard
+                "num_predict": 80,  # commit messages are short — cap tokens hard
                 "temperature": 0.2,
                 "top_p": 0.9,
             },
@@ -171,12 +173,14 @@ def make_commit_client(cfg_ollama) -> OllamaClient:
         timeout=cfg_ollama.timeout,
     )
 
+
 def make_analysis_client(cfg_ollama) -> OllamaClient:
     return OllamaClient(
         host=cfg_ollama.host,
         model=cfg_ollama.analysis_model,
         timeout=cfg_ollama.timeout,
     )
+
 
 def make_review_client(cfg_ollama) -> OllamaClient:
     return OllamaClient(
@@ -199,24 +203,24 @@ _IMPORT_RE = re.compile(
 # Known libraries/decorators → human-readable keyword phrases. Lets the
 # summary say "slash commands" instead of just "app_commands".
 _KEYWORD_MAP: dict[str, list[str]] = {
-    "discord":     ["discord"],
+    "discord": ["discord"],
     "app_commands": ["slash commands", "app_commands"],
-    "commands":    ["bot commands"],
-    "flask":       ["flask", "web"],
-    "fastapi":     ["fastapi", "api"],
-    "django":      ["django", "web"],
-    "click":       ["cli"],
-    "argparse":    ["cli"],
-    "pytest":      ["tests"],
-    "unittest":    ["tests"],
-    "asyncio":     ["async"],
-    "requests":    ["http"],
-    "httpx":       ["http"],
-    "sqlalchemy":  ["database"],
-    "numpy":       ["numerics"],
-    "pandas":      ["data"],
-    "torch":       ["ml"],
-    "tensorflow":  ["ml"],
+    "commands": ["bot commands"],
+    "flask": ["flask", "web"],
+    "fastapi": ["fastapi", "api"],
+    "django": ["django", "web"],
+    "click": ["cli"],
+    "argparse": ["cli"],
+    "pytest": ["tests"],
+    "unittest": ["tests"],
+    "asyncio": ["async"],
+    "requests": ["http"],
+    "httpx": ["http"],
+    "sqlalchemy": ["database"],
+    "numpy": ["numerics"],
+    "pandas": ["data"],
+    "torch": ["ml"],
+    "tensorflow": ["ml"],
 }
 
 _STOPWORD_BASES = {"typing", "dataclasses", "pathlib", "collections", "abc"}
@@ -228,8 +232,7 @@ def _module_base(name: str) -> str:
 
 # Fallback for non-Python files — same loose symbol detector as before.
 _GENERIC_SYM_RE = re.compile(
-    r"^[+-](?:function |const |let |var |export )"
-    r"([A-Za-z_][A-Za-z0-9_]*)",
+    r"^[+-](?:function |const |let |var |export )" r"([A-Za-z_][A-Za-z0-9_]*)",
     re.MULTILINE,
 )
 
@@ -257,12 +260,12 @@ def build_commit_summary(file: str, diff: str) -> tuple[str, int, int]:
     lines = [f"File: {file}", f"+{adds}  -{dels}", f"Type: {ext}"]
 
     if ext == "py":
-        added_defs:   list[str] = []
+        added_defs: list[str] = []
         removed_defs: list[str] = []
-        seen_added:   set[str] = set()
+        seen_added: set[str] = set()
         seen_removed: set[str] = set()
         keyword_bases: list[str] = []  # decorator/import roots, in order seen
-        seen_bases:    set[str] = set()
+        seen_bases: set[str] = set()
 
         for raw in diff.splitlines():
             if not raw or raw[0] not in "+-":
@@ -342,6 +345,7 @@ def build_commit_summary(file: str, diff: str) -> tuple[str, int, int]:
 
 # ── Message cache ─────────────────────────────────────────────────────────────
 
+
 def _cache_path(root: Path) -> Path:
     d = root / ".kyte"
     d.mkdir(exist_ok=True)
@@ -360,9 +364,7 @@ def _load_cache(root: Path) -> dict:
 
 def _save_cache(root: Path, cache: dict) -> None:
     try:
-        _cache_path(root).write_text(
-            json.dumps(cache, indent=2), encoding="utf-8"
-        )
+        _cache_path(root).write_text(json.dumps(cache, indent=2), encoding="utf-8")
     except OSError:
         pass
 
@@ -374,16 +376,26 @@ def _diff_hash(diff: str) -> str:
 # ── Auto message (no AI) ──────────────────────────────────────────────────────
 
 _TYPE_MAP = {
-    ".py": "chore", ".js": "chore", ".ts": "chore",
-    ".css": "style", ".scss": "style",
-    ".md": "docs", ".rst": "docs", ".txt": "docs",
-    ".json": "chore", ".toml": "chore", ".yaml": "chore", ".yml": "chore",
-    ".sh": "chore", ".bash": "chore",
+    ".py": "chore",
+    ".js": "chore",
+    ".ts": "chore",
+    ".css": "style",
+    ".scss": "style",
+    ".md": "docs",
+    ".rst": "docs",
+    ".txt": "docs",
+    ".json": "chore",
+    ".toml": "chore",
+    ".yaml": "chore",
+    ".yml": "chore",
+    ".sh": "chore",
+    ".bash": "chore",
 }
 
+
 def _auto_message(file: str, adds: int, dels: int) -> str:
-    ext  = os.path.splitext(file)[1].lower()
-    typ  = _TYPE_MAP.get(ext, "chore")
+    ext = os.path.splitext(file)[1].lower()
+    typ = _TYPE_MAP.get(ext, "chore")
     stem = os.path.splitext(os.path.basename(file))[0]
     scope = stem.replace("_", "-").replace(" ", "-")
     if adds > 0 and dels == 0:
@@ -396,6 +408,7 @@ def _auto_message(file: str, adds: int, dels: int) -> str:
 
 
 # ── Public API ────────────────────────────────────────────────────────────────
+
 
 def generate_commit_message(
     client: OllamaClient,
@@ -425,7 +438,7 @@ def generate_commit_message(
     # ── 1. cache ──────────────────────────────────────────────────────────────
     if root and diff.strip():
         cache = _load_cache(root)
-        key   = _diff_hash(diff)
+        key = _diff_hash(diff)
         if key in cache:
             return cache[key], "cache"
 
@@ -443,8 +456,7 @@ def generate_commit_message(
         return fallback_msg, "fallback"
 
     prompt = (
-        f"{summary}\n\n"
-        "Write a one-line conventional commit message for this change."
+        f"{summary}\n\n" "Write a one-line conventional commit message for this change."
     )
     try:
         message = client.generate(prompt, system=SYSTEM_COMMIT_MSG)
@@ -466,8 +478,11 @@ def generate_commit_message(
     return message, "ollama"
 
 
-def analyze_diff(client: OllamaClient, project: str, files: list[str], diff: str) -> str:
+def analyze_diff(
+    client: OllamaClient, project: str, files: list[str], diff: str
+) -> str:
     from .utils import truncate
+
     files_block = "\n".join(f"  - {f}" for f in files[:50])
     prompt = (
         f"Project: {project}\n\nChanged files:\n{files_block}\n\n"
@@ -484,6 +499,7 @@ def analyze_diff(client: OllamaClient, project: str, files: list[str], diff: str
 
 def review_diff(client: OllamaClient, file: str, diff: str) -> str:
     from .utils import truncate
+
     prompt = (
         f"File: {file}\n\nDiff:\n{truncate(diff, 6000)}\n\n"
         "Review this change. Respond in this format:\n\n"
