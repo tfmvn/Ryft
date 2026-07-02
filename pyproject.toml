@@ -3,13 +3,13 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "kyte"
+name = "ryft"
 dynamic = ["version"]
 description = "A calm, fast terminal companion for git — AI commit messages, live sync, and one-command onboarding."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
-authors = [{ name = "Kyte" }]
+authors = [{ name = "Ryft" }]
 keywords = ["cli", "git", "ai", "developer-tools", "ollama"]
 classifiers = [
     "Environment :: Console",
@@ -28,14 +28,14 @@ dependencies = [
 dev = ["pytest>=8.0"]
 
 [project.urls]
-Homepage = "https://github.com/kyte-dev/kyte"
-Issues = "https://github.com/kyte-dev/kyte/issues"
+Homepage = "https://github.com/ryft-dev/ryft"
+Issues = "https://github.com/ryft-dev/ryft/issues"
 
 [project.scripts]
-kyte = "kyte.__main__:main"
+ryft = "ryft.__main__:main"
 
 [tool.setuptools.dynamic]
-version = { attr = "kyte.__version__" }
+version = { attr = "ryft.__version__" }
 
 [tool.setuptools.packages.find]
-include = ["kyte*"]
+include = ["ryft*"]

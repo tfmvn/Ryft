@@ -1,4 +1,4 @@
-"""Git integration. Every git invocation in Kyte goes through `_run()` here —
+"""Git integration. Every git invocation in Ryft goes through `_run()` here —
 no other module shells out to the `git` binary directly.
 """
 

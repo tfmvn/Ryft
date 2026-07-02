@@ -1,4 +1,4 @@
-"""Kyte Terminal UI — v3.
+"""Ryft Terminal UI — v3.
 
 Palette: dark github-style base, violet primary, cyan secondary,
 teal for AI, mint/amber/coral for status. GitHub-accurate diff colours.
@@ -397,7 +397,7 @@ def render_onboarding_welcome() -> None:
     console.print()
     wm = Text()
     wm.append("  Welcome to ", style=TEXT_HI)
-    wm.append("Kyte", style=f"bold {VIOLET}")
+    wm.append("Ryft", style=f"bold {VIOLET}")
     wm.append(".", style=TEXT_HI)
     console.print(wm)
     console.print()
@@ -459,10 +459,10 @@ def render_completion_screen(project_name: str) -> None:
     console.print()
 
     suggestions = [
-        ("kyte watch",  "start watching this folder and auto-commit changes"),
-        ("kyte commit", "commit your current changes with an AI message"),
-        ("kyte review", "get an AI code review of what changed"),
-        ("kyte doctor", "check that everything is set up correctly"),
+        ("ryft watch",  "start watching this folder and auto-commit changes"),
+        ("ryft commit", "commit your current changes with an AI message"),
+        ("ryft review", "get an AI code review of what changed"),
+        ("ryft doctor", "check that everything is set up correctly"),
     ]
     for cmd, desc in suggestions:
         row = Text()
@@ -478,10 +478,10 @@ def render_completion_screen(project_name: str) -> None:
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# KyteApp — REPL shell
+# RyftApp — REPL shell
 # ═══════════════════════════════════════════════════════════════════════════════
 
-class KyteApp:
+class RyftApp:
     def __init__(self, ctx: "AppContext", first_run: bool = False) -> None:
         self.ctx = ctx
         self.first_run = first_run
@@ -597,7 +597,7 @@ class KyteApp:
 
         console.print()
         wm = Text()
-        wm.append("  kyte", style=f"bold {VIOLET}")
+        wm.append("  ryft", style=f"bold {VIOLET}")
         wm.append(f"  {cfg.project.name}", style=f"bold {TEXT_HI}")
         wm.append(f"  ·  {cfg.root}", style=TEXT_DIM)
         console.print(wm)

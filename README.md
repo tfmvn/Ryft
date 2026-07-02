@@ -1,14 +1,14 @@
-# Kyte
+# Ryft
 
 A calm, fast terminal companion for git — AI commit messages, live sync,
 formatting, and health checks, wrapped in a premium terminal UI.
 
 ```bash
-pip install kyte
-kyte
+pip install ryft
+ryft
 ```
 
-That's it. If this is the first time Kyte has been run in this folder, it
+That's it. If this is the first time Ryft has been run in this folder, it
 will walk you through a 10-second setup and drop you straight into a
 ready-to-use session.
 
@@ -17,39 +17,39 @@ ready-to-use session.
 - **AI commit messages** — a small local model (via [Ollama](https://ollama.com))
   writes conventional commit messages from your diff. Tiny changes skip the
   AI entirely; identical diffs are cached.
-- **Live sync** — `kyte watch` watches your project and automatically
+- **Live sync** — `ryft watch` watches your project and automatically
   formats, messages, commits, and (optionally) pushes on save.
 - **Formatting** — strips comments and collapses blank lines for Python and
   Lua, safely (it verifies the result still parses before writing).
 - **AI review & analysis** — `/review` and `/analyze` for a second pair of
   eyes on your changes, using a larger local model.
-- **`kyte doctor`** — a full health check (Python, git, remotes, branch,
+- **`ryft doctor`** — a full health check (Python, git, remotes, branch,
   Ollama, models, config, permissions, repo state) with plain-English
-  explanations and one-command auto-fixes (`kyte doctor fix`).
+  explanations and one-command auto-fixes (`ryft doctor fix`).
 
 ## Usage
 
-Kyte works two ways:
+Ryft works two ways:
 
 ```bash
-kyte              # interactive session — type /help for commands
-kyte doctor       # run one command and exit, e.g. from a script or CI
-kyte commit
-kyte watch
-kyte --help       # usage summary
-kyte --version    # installed version
+ryft              # interactive session — type /help for commands
+ryft doctor       # run one command and exit, e.g. from a script or CI
+ryft commit
+ryft watch
+ryft --help       # usage summary
+ryft --version    # installed version
 ```
 
-Running a single command (anything after `kyte`) never blocks on a prompt —
+Running a single command (anything after `ryft`) never blocks on a prompt —
 if there's no `.src.py` yet it proceeds on sane defaults instead of asking,
-so it's safe to call from scripts and CI. Run `kyte init` first if you want
+so it's safe to call from scripts and CI. Run `ryft init` first if you want
 the interactive setup walkthrough.
 
 Inside the interactive session, everything is a slash command:
 
 ```
 /status             project status at a glance
-/init                set up Kyte in this project (safe to re-run)
+/init                set up Ryft in this project (safe to re-run)
 /commit              commit all changed files, AI messages generated in parallel
 /push  /pull         publish or fetch
 /diff  /diff <file>  GitHub-style diff, scrollable
@@ -63,7 +63,7 @@ Inside the interactive session, everything is a slash command:
 
 ## Configuration
 
-Kyte is configured with a `.src.py` file at your project root — plain
+Ryft is configured with a `.src.py` file at your project root — plain
 Python, not YAML/TOML, so it's just as easy to script as it is to read:
 
 ```python
@@ -79,7 +79,7 @@ class Git:
     remote = "origin"
 ```
 
-If no `.src.py` exists, Kyte offers to create one the first time you run
+If no `.src.py` exists, Ryft offers to create one the first time you run
 it — you're never left guessing what to do next.
 
 ## Development

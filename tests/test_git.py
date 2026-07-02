@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from kyte import git
+from ryft import git
 
 
 @pytest.fixture

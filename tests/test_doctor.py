@@ -3,8 +3,8 @@ from pathlib import Path
 
 import pytest
 
-from kyte import config, doctor, git
-from kyte.models import AppContext, Config
+from ryft import config, doctor, git
+from ryft.models import AppContext, Config
 
 
 def _ctx_for(root: Path) -> AppContext:
@@ -87,7 +87,7 @@ def test_summarize_counts():
 
 
 def test_config_auto_fix_creates_file(tmp_path, monkeypatch):
-    from kyte import ui
+    from ryft import ui
     monkeypatch.setattr(ui, "confirm", lambda *a, **k: True)
 
     ctx = _ctx_for(tmp_path)

@@ -1,4 +1,4 @@
-"""`kyte doctor` — comprehensive health checks.
+"""`ryft doctor` — comprehensive health checks.
 
 Each check produces a `DoctorCheck`: a status (ok/warn/fail), a short
 detail for the summary line, and — for anything that isn't "ok" — a
@@ -41,7 +41,7 @@ def _python_check() -> DoctorCheck:
         return DoctorCheck("Python", "ok", ver_str)
     return DoctorCheck(
         "Python", "warn", ver_str,
-        why=f"Kyte targets Python {MIN_PYTHON[0]}.{MIN_PYTHON[1]}+; older versions may hit "
+        why=f"Ryft targets Python {MIN_PYTHON[0]}.{MIN_PYTHON[1]}+; older versions may hit "
             "subtle typing/stdlib differences.",
         fix_hint=f"Upgrade to Python {MIN_PYTHON[0]}.{MIN_PYTHON[1]} or newer.",
     )
@@ -52,8 +52,8 @@ def _git_installed_check() -> DoctorCheck:
         return DoctorCheck("Git installation", "ok", "found on PATH")
     return DoctorCheck(
         "Git installation", "fail", "not found",
-        why="Kyte shells out to git for every status/diff/commit/push — nothing works without it.",
-        fix_hint="Install git (e.g. 'apt install git', 'brew install git') then re-run 'kyte doctor'.",
+        why="Ryft shells out to git for every status/diff/commit/push — nothing works without it.",
+        fix_hint="Install git (e.g. 'apt install git', 'brew install git') then re-run 'ryft doctor'.",
     )
 
 
@@ -62,8 +62,8 @@ def _repo_check(root: Path) -> DoctorCheck:
         return DoctorCheck("Current repository", "ok", str(root))
     return DoctorCheck(
         "Current repository", "fail", f"{root} is not a git repository",
-        why="Kyte tracks changes and commits through git; without a repo there's nothing to sync.",
-        fix_hint="Run 'git init' in this folder, or let Kyte do it for you.",
+        why="Ryft tracks changes and commits through git; without a repo there's nothing to sync.",
+        fix_hint="Run 'git init' in this folder, or let Ryft do it for you.",
         auto_fix=lambda: recovery.ensure_git_repo(root),
     )
 
@@ -100,7 +100,7 @@ def _ollama_installed_check() -> DoctorCheck:
         return DoctorCheck("Ollama installation", "ok", "found on PATH")
     return DoctorCheck(
         "Ollama installation", "warn", "not found",
-        why="Without Ollama, Kyte falls back to template commit messages — everything else still works.",
+        why="Without Ollama, Ryft falls back to template commit messages — everything else still works.",
         fix_hint="Install from https://ollama.com to enable AI commit messages, review, and analysis.",
     )
 
@@ -132,7 +132,7 @@ def _models_check(cfg_ollama) -> DoctorCheck:
     return DoctorCheck(
         "Required models", "warn", f"missing: {', '.join(missing)}",
         why="Commit/analysis/review will fall back to templates until these are pulled.",
-        fix_hint="Run: ollama pull <model>  (or let Kyte pull it for you)",
+        fix_hint="Run: ollama pull <model>  (or let Ryft pull it for you)",
         auto_fix=lambda: all(recovery.ensure_model(cfg_ollama, m) for m in missing),
     )
 
@@ -145,13 +145,13 @@ def _config_check(ctx: "AppContext") -> DoctorCheck:
     if status == "missing":
         return DoctorCheck(
             "Configuration", "warn", "no .src.py found — using defaults",
-            why="Without .src.py, Kyte uses built-in defaults for models, git, and formatting.",
+            why="Without .src.py, Ryft uses built-in defaults for models, git, and formatting.",
             fix_hint="Run '/config init' to create one.",
             auto_fix=lambda: recovery.ensure_config(ctx),
         )
     return DoctorCheck(
         "Configuration", "fail", detail or "invalid",
-        why="Kyte couldn't execute .src.py, so it silently fell back to defaults.",
+        why="Ryft couldn't execute .src.py, so it silently fell back to defaults.",
         fix_hint="Fix the syntax error above, or run '/config init' to reset to defaults.",
         auto_fix=lambda: recovery.ensure_config(ctx),
     )
@@ -162,7 +162,7 @@ def _permissions_check(root: Path) -> DoctorCheck:
         return DoctorCheck("Permissions", "ok", f"{root} is writable")
     return DoctorCheck(
         "Permissions", "fail", f"{root} is not writable",
-        why="Kyte needs to write formatted files, .src.py, and .kyte/cache.json here.",
+        why="Ryft needs to write formatted files, .src.py, and .ryft/cache.json here.",
         fix_hint=f"Fix ownership/permissions on {root} (e.g. 'chown' or 'chmod u+w').",
     )
 

@@ -2,8 +2,8 @@ from pathlib import Path
 
 import pytest
 
-from kyte import config, git, recovery, ui
-from kyte.models import AppContext
+from ryft import config, git, recovery, ui
+from ryft.models import AppContext
 
 
 def _ctx_for(root: Path) -> AppContext:

@@ -17,7 +17,7 @@ from .utils import discover_files, human_path
 # In src/commands.py
 SUPPORTED_SUFFIXES = {".py", ".lua"}
 
-# # # Decrypted from kyte/formatter.py:
+# # # Decrypted from ryft/formatter.py:
 # # In cmd_format()
 # files = discover_files(cfg.root, cfg.ignore, suffixes=SUPPORTED_SUFFIXES)
 
@@ -53,7 +53,7 @@ def cmd_exit(ctx, args: list[str]) -> None:
 
 def cmd_watch(ctx, args: list[str]) -> None:
     """Foreground sync: watch this folder and auto-commit on save until
-    interrupted. This is what `kyte watch` runs from the shell."""
+    interrupted. This is what `ryft watch` runs from the shell."""
     cfg = ctx.config
     if not git.is_repo(cfg.root) and not recovery.ensure_git_repo(cfg.root):
         ui.warn("Watch needs a git repository. Run '/doctor fix' when you're ready.")
@@ -461,7 +461,7 @@ def cmd_doctor(ctx, args: list[str]) -> None:
     ui.success(f"Fixed {fixed}/{len(fixable)} issue(s). Run '/doctor' again to confirm.")
 
 def cmd_init(ctx, args: list[str]) -> None:
-    """Explicit onboarding entry point (`kyte init` / `/init`).
+    """Explicit onboarding entry point (`ryft init` / `/init`).
 
     Safe to run repeatedly: if a valid `.src.py` already exists, this
     just says so and stops — it never overwrites configuration without
@@ -471,7 +471,7 @@ def cmd_init(ctx, args: list[str]) -> None:
     status, detail = config_mod.validate_config(root)
 
     if status == "valid":
-        ui.info(f"Kyte is already initialized here ({root / config_mod.CONFIG_FILENAME}).")
+        ui.info(f"Ryft is already initialized here ({root / config_mod.CONFIG_FILENAME}).")
         if not ui.confirm("Reset configuration to defaults anyway?", default=False):
             return
     elif status == "invalid":
@@ -534,7 +534,7 @@ COMMANDS: dict[str, CommandSpec] = {
     "status":   CommandSpec("status",   cmd_status,   "Show project status.",            usage=["/status"]),
     "activity": CommandSpec("activity", cmd_activity, "Show the activity feed.",         usage=["/activity"]),
     "sync":     CommandSpec("sync",     cmd_sync,     "Start/stop sync.",                usage=["/sync start|stop"]),
-    "watch":    CommandSpec("watch",    cmd_watch,    "Watch this folder and auto-commit.", usage=["/watch", "kyte watch"]),
+    "watch":    CommandSpec("watch",    cmd_watch,    "Watch this folder and auto-commit.", usage=["/watch", "ryft watch"]),
     "format":   CommandSpec("format",   cmd_format,   "Format files.",                   usage=["/format .", "/format changed"]),
     "analyze":  CommandSpec("analyze",  cmd_analyze,  "AI summary of changes.",          usage=["/analyze"]),
     "review":   CommandSpec("review",   cmd_review,   "AI code review.",                 usage=["/review", "/review <file>"]),
@@ -546,13 +546,13 @@ COMMANDS: dict[str, CommandSpec] = {
     "pull":     CommandSpec("pull",     cmd_pull,     "Pull commits.",                   usage=["/pull"]),
     "diff":     CommandSpec("diff",     cmd_diff,     "Show a diff.",                    usage=["/diff", "/diff <file>"]),
     "log":      CommandSpec("log",      cmd_log,      "Show recent commits.",            usage=["/log"]),
-    "init":     CommandSpec("init",     cmd_init,     "Set up Kyte in this project.",    usage=["/init", "kyte init"]),
+    "init":     CommandSpec("init",     cmd_init,     "Set up Ryft in this project.",    usage=["/init", "ryft init"]),
     "doctor":   CommandSpec("doctor",   cmd_doctor,   "Run health checks.",              usage=["/doctor", "/doctor fix"]),
     "config":   CommandSpec("config",   cmd_config,   "Show config.",                    usage=["/config", "/config init"]),
     "tree":     CommandSpec("tree",     cmd_tree,     "Show project tree.",              usage=["/tree"]),
     "files":    CommandSpec("files",    cmd_files,    "List tracked files.",             usage=["/files"]),
     "root":     CommandSpec("root",     cmd_root,     "Show project root.",              usage=["/root"]),
-    "exit":     CommandSpec("exit",     cmd_exit,     "Exit Kyte.",                      usage=["/exit"]),
+    "exit":     CommandSpec("exit",     cmd_exit,     "Exit Ryft.",                      usage=["/exit"]),
 }
 
 COMMANDS["quit"] = COMMANDS["exit"]
@@ -573,7 +573,7 @@ def dispatch(ctx, raw: str) -> None:
     raw = raw.strip()
     if not raw: return
     if not raw.startswith("/"):
-        ui.warn("Kyte only understands slash commands. Try /help.")
+        ui.warn("Ryft only understands slash commands. Try /help.")
         return
     parts = raw[1:].split()
     if not parts: return
@@ -582,7 +582,7 @@ def dispatch(ctx, raw: str) -> None:
 
 
 def dispatch_argv(ctx, argv: list[str]) -> None:
-    """Dispatch a command from already-split argv, e.g. `kyte diff foo.py`
+    """Dispatch a command from already-split argv, e.g. `ryft diff foo.py`
     from the shell. Unlike dispatch(), this never re-joins/re-splits the
     arguments, so a value containing spaces (a quoted filename, a commit
     message, ...) survives intact."""

@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from kyte import formatter
+from ryft import formatter
 
 
 def test_python_comment_remover_strips_comments():

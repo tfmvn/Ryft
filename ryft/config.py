@@ -14,7 +14,7 @@ T = TypeVar("T")
 
 CONFIG_FILENAME = ".src.py"
 
-DEFAULT_IGNORE = ["__pycache__", ".venv", "venv", "dist", "build", ".git", "kyte"]
+DEFAULT_IGNORE = ["__pycache__", ".venv", "venv", "dist", "build", ".git", "ryft"]
 
 DEFAULT_PY = """\
 # .src.py

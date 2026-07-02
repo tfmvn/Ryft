@@ -2,10 +2,10 @@ from pathlib import Path
 
 import pytest
 
-from kyte import commands, config, git, ui
-from kyte.models import AppContext
-from kyte.sync import SyncController
-from kyte.utils import ActivityFeed
+from ryft import commands, config, git, ui
+from ryft.models import AppContext
+from ryft.sync import SyncController
+from ryft.utils import ActivityFeed
 
 
 def _ctx_for(root: Path) -> AppContext:

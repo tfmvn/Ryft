@@ -1,4 +1,4 @@
-"""Shared data shapes used across Kyte."""
+"""Shared data shapes used across Ryft."""
 
 from __future__ import annotations
 

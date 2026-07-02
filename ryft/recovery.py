@@ -8,7 +8,7 @@ running Ollama daemon) gets one small `ensure_*` function here. Each one:
   3. performs the fix with live feedback
   4. re-validates and reports the result
 
-`kyte doctor` calls these in "fix" mode. Commands that hit a hard
+`ryft doctor` calls these in "fix" mode. Commands that hit a hard
 precondition (e.g. /commit with no repo) can call the same function
 instead of just failing, so the user is never stranded.
 """
@@ -29,7 +29,7 @@ def ensure_git_repo(root: Path) -> bool:
     if git.is_repo(root):
         return True
     if not git.is_installed():
-        ui.error("git is not installed — install it before Kyte can track changes.")
+        ui.error("git is not installed — install it before Ryft can track changes.")
         return False
     if not ui.confirm(f"No git repository found at {root}. Initialize one now?"):
         return False
@@ -75,7 +75,7 @@ def ensure_ollama_running(cfg_ollama) -> bool:
         return True
     if not ai.is_ollama_installed():
         ui.warn("Ollama isn't installed. AI features will use fallback commit messages.")
-        ui.info("Install it from https://ollama.com, then run 'kyte doctor' again.")
+        ui.info("Install it from https://ollama.com, then run 'ryft doctor' again.")
         return False
     ui.warn(f"Ollama isn't reachable at {cfg_ollama.host}.")
     ui.info("Start it with: ollama serve")

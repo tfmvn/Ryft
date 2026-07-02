@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from kyte import ai
+from ryft import ai
 
 
 DIFF = """diff --git a/foo.py b/foo.py

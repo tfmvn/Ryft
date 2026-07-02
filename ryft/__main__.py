@@ -1,9 +1,9 @@
-"""Entry point: `python3 -m kyte` (also installed as the `kyte` script).
+"""Entry point: `python3 -m ryft` (also installed as the `ryft` script).
 
 Supports two modes:
-  kyte                 → interactive REPL (with first-run onboarding)
-  kyte <command> [...]  → run one command non-interactively and exit,
-                          e.g. `kyte doctor`, `kyte commit`, `kyte watch`
+  ryft                 → interactive REPL (with first-run onboarding)
+  ryft <command> [...]  → run one command non-interactively and exit,
+                          e.g. `ryft doctor`, `ryft commit`, `ryft watch`
 """
 
 from __future__ import annotations
@@ -29,22 +29,22 @@ def _build_ai_client(cfg) -> ai.OllamaClient:
 
 
 _HELP_TEXT = """\
-kyte — a calm, fast terminal companion for git
+ryft — a calm, fast terminal companion for git
 
 Usage:
-  kyte                  interactive session (type /help once inside)
-  kyte <command> [args]  run one command and exit, e.g. from a script or CI
-  kyte --help, -h        show this help and exit
-  kyte --version         show the installed version and exit
+  ryft                  interactive session (type /help once inside)
+  ryft <command> [args]  run one command and exit, e.g. from a script or CI
+  ryft --help, -h        show this help and exit
+  ryft --version         show the installed version and exit
 
 Common commands:
-  kyte init              set up Kyte in this project
-  kyte doctor             health check + auto-repair ('kyte doctor fix')
-  kyte commit              commit changed files with an AI-written message
-  kyte watch               watch this folder and auto-commit on save
-  kyte push  / kyte pull   publish or fetch
+  ryft init              set up Ryft in this project
+  ryft doctor             health check + auto-repair ('ryft doctor fix')
+  ryft commit              commit changed files with an AI-written message
+  ryft watch               watch this folder and auto-commit on save
+  ryft push  / ryft pull   publish or fetch
 
-Run 'kyte' with no arguments and type /help for the full command list.
+Run 'ryft' with no arguments and type /help for the full command list.
 """
 
 
@@ -54,7 +54,7 @@ def _print_help() -> None:
 
 def _print_version() -> None:
     from . import __version__
-    print(f"kyte {__version__}")
+    print(f"ryft {__version__}")
 
 
 def build_context(interactive: bool = True, quiet: bool = False) -> tuple[AppContext, bool]:
@@ -62,14 +62,14 @@ def build_context(interactive: bool = True, quiet: bool = False) -> tuple[AppCon
     `.src.py` is found anywhere above the current directory.
 
     *interactive* controls what happens when no config exists yet:
-      - True  (the bare `kyte` REPL): run the full onboarding walkthrough.
-      - False (a one-shot `kyte <command>`, e.g. from a script or CI):
+      - True  (the bare `ryft` REPL): run the full onboarding walkthrough.
+      - False (a one-shot `ryft <command>`, e.g. from a script or CI):
         proceed on in-memory defaults instead of prompting for input,
         since there's no guarantee stdin is attached to a human. Use
-        `kyte init` to run onboarding explicitly.
+        `ryft init` to run onboarding explicitly.
 
     *quiet* suppresses the "using defaults" notice in the non-interactive
-    path — used when the command about to run is `kyte init` itself,
+    path — used when the command about to run is `ryft init` itself,
     which explains the situation on its own terms.
 
     Returns (ctx, first_run) — first_run is True only when onboarding
@@ -85,7 +85,7 @@ def build_context(interactive: bool = True, quiet: bool = False) -> tuple[AppCon
         else:
             cfg = config.load_config(cwd)
             if not quiet:
-                ui.info("No .src.py found — using defaults. Run 'kyte init' to set one up.")
+                ui.info("No .src.py found — using defaults. Run 'ryft init' to set one up.")
     else:
         root = config.find_root(cwd) or cwd
         cfg = config.load_config(root)
@@ -108,10 +108,10 @@ def main() -> None:
         _print_version()
         return
 
-    # Bare `kyte` starts the interactive REPL, so onboarding can be a full
-    # walkthrough. `kyte <command>` runs once and exits — it may be called
+    # Bare `ryft` starts the interactive REPL, so onboarding can be a full
+    # walkthrough. `ryft <command>` runs once and exits — it may be called
     # from a script or CI, so it shouldn't block waiting on a prompt.
-    # `kyte init` is the one exception: it's an explicit request to run
+    # `ryft init` is the one exception: it's an explicit request to run
     # onboarding, so it handles that conversation itself (see cmd_init).
     is_init = bool(argv) and argv[0].lower() == "init"
     ctx, first_run = build_context(interactive=not argv, quiet=is_init)
@@ -120,13 +120,13 @@ def main() -> None:
         ctx.sync.start()
 
     if argv:
-        # Non-interactive: `kyte doctor`, `kyte commit`, `kyte watch fix`, ...
+        # Non-interactive: `ryft doctor`, `ryft commit`, `ryft watch fix`, ...
         # Dispatched from argv directly (not re-joined into a string) so
         # arguments containing spaces, e.g. a quoted filename, survive.
         commands.dispatch_argv(ctx, argv)
         return
 
-    app = ui.KyteApp(ctx, first_run=first_run)
+    app = ui.RyftApp(ctx, first_run=first_run)
     app.run()
 
 

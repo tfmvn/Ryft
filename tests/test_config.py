@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from kyte import config
+from ryft import config
 
 
 def test_find_root_none_when_absent(tmp_path):

@@ -4,7 +4,7 @@ Architecture for speed:
 - Separate clients per role: commit (small model), analysis, review (large model)
 - build_commit_summary() sends <200 chars to Ollama instead of 4000-char raw diffs
 - Fast-path: tiny changes (<= threshold) skip AI entirely
-- Message cache: .kyte/cache.json avoids redundant AI calls for identical diffs
+- Message cache: .ryft/cache.json avoids redundant AI calls for identical diffs
 - Parallel generation via ThreadPoolExecutor (called from commands.py)
 """
 
@@ -343,7 +343,7 @@ def build_commit_summary(file: str, diff: str) -> tuple[str, int, int]:
 # ── Message cache ─────────────────────────────────────────────────────────────
 
 def _cache_path(root: Path) -> Path:
-    d = root / ".kyte"
+    d = root / ".ryft"
     d.mkdir(exist_ok=True)
     return d / "cache.json"
 

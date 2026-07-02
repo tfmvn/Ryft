@@ -1,6 +1,6 @@
 """First-run onboarding.
 
-Triggered when Kyte is launched inside a project with no `.src.py`
+Triggered when Ryft is launched inside a project with no `.src.py`
 anywhere in the current directory or its parents. Rather than silently
 falling back to defaults or crashing, it walks the user through creating
 one — or, if declined, proceeds on in-memory defaults for this session.

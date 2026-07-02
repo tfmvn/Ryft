@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from kyte import config, onboarding, ui
+from ryft import config, onboarding, ui
 
 
 def test_needs_onboarding_true_without_config(tmp_path):
