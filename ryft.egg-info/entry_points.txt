@@ -1,0 +1,2 @@
+[console_scripts]
+ryft = ryft.__main__:main
