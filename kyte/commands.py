@@ -8,7 +8,7 @@ from pathlib import Path
 
 from rich.tree import Tree  # type: ignore[import]
 
-from . import ai, config as config_mod, doctor as doctor_mod, formatter, git, recovery, ui
+from . import ai, config as config_mod, doctor as doctor_mod, formatter, git, onboarding, recovery, ui
 from .config import DEFAULT_IGNORE
 from .models import CommandSpec
 from .sync import run_commit_pipeline  # used by sync watcher
@@ -460,6 +460,30 @@ def cmd_doctor(ctx, args: list[str]) -> None:
 
     ui.success(f"Fixed {fixed}/{len(fixable)} issue(s). Run '/doctor' again to confirm.")
 
+def cmd_init(ctx, args: list[str]) -> None:
+    """Explicit onboarding entry point (`kyte init` / `/init`).
+
+    Safe to run repeatedly: if a valid `.src.py` already exists, this
+    just says so and stops — it never overwrites configuration without
+    an explicit confirmation.
+    """
+    root = ctx.config.root
+    status, detail = config_mod.validate_config(root)
+
+    if status == "valid":
+        ui.info(f"Kyte is already initialized here ({root / config_mod.CONFIG_FILENAME}).")
+        if not ui.confirm("Reset configuration to defaults anyway?", default=False):
+            return
+    elif status == "invalid":
+        ui.warn(f"A .src.py exists but is invalid: {detail}")
+        if not ui.confirm("Reset it to defaults?", default=True):
+            return
+
+    cfg, created = onboarding.run_onboarding(root)
+    ctx.config = cfg
+    if created:
+        ui.render_completion_screen(cfg.project.name)
+
 def cmd_config(ctx, args: list[str]) -> None:
     cfg = ctx.config
     if args and args[0] == "init":
@@ -522,6 +546,7 @@ COMMANDS: dict[str, CommandSpec] = {
     "pull":     CommandSpec("pull",     cmd_pull,     "Pull commits.",                   usage=["/pull"]),
     "diff":     CommandSpec("diff",     cmd_diff,     "Show a diff.",                    usage=["/diff", "/diff <file>"]),
     "log":      CommandSpec("log",      cmd_log,      "Show recent commits.",            usage=["/log"]),
+    "init":     CommandSpec("init",     cmd_init,     "Set up Kyte in this project.",    usage=["/init", "kyte init"]),
     "doctor":   CommandSpec("doctor",   cmd_doctor,   "Run health checks.",              usage=["/doctor", "/doctor fix"]),
     "config":   CommandSpec("config",   cmd_config,   "Show config.",                    usage=["/config", "/config init"]),
     "tree":     CommandSpec("tree",     cmd_tree,     "Show project tree.",              usage=["/tree"]),
@@ -532,7 +557,19 @@ COMMANDS: dict[str, CommandSpec] = {
 
 COMMANDS["quit"] = COMMANDS["exit"]
 
+def _execute(ctx, name: str, args: list[str], label: str) -> None:
+    spec = COMMANDS.get(name)
+    if spec is None:
+        ui.error(f"Unknown command: {label}. Try /help.")
+        return
+    try:
+        spec.handler(ctx, args)
+    except Exception as exc:
+        ui.error(f"{label} failed: {exc}")
+
+
 def dispatch(ctx, raw: str) -> None:
+    """Dispatch a single typed REPL line, e.g. '/commit' or '/diff foo.py'."""
     raw = raw.strip()
     if not raw: return
     if not raw.startswith("/"):
@@ -541,11 +578,14 @@ def dispatch(ctx, raw: str) -> None:
     parts = raw[1:].split()
     if not parts: return
     name, args = parts[0].lower(), parts[1:]
-    spec = COMMANDS.get(name)
-    if spec is None:
-        ui.error(f"Unknown command: /{name}. Try /help.")
-        return
-    try:
-        spec.handler(ctx, args)
-    except Exception as exc:
-        ui.error(f"/{name} failed: {exc}")
+    _execute(ctx, name, args, f"/{name}")
+
+
+def dispatch_argv(ctx, argv: list[str]) -> None:
+    """Dispatch a command from already-split argv, e.g. `kyte diff foo.py`
+    from the shell. Unlike dispatch(), this never re-joins/re-splits the
+    arguments, so a value containing spaces (a quoted filename, a commit
+    message, ...) survives intact."""
+    if not argv: return
+    name, args = argv[0].lower(), argv[1:]
+    _execute(ctx, name, args, name)

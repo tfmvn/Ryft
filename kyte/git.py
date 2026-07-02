@@ -4,6 +4,7 @@ no other module shells out to the `git` binary directly.
 
 from __future__ import annotations
 
+import os
 import shutil
 import subprocess
 from dataclasses import dataclass
@@ -143,7 +144,9 @@ def diff_for(root: Path, path: str) -> str:
     if diff:
         return diff
     try:
-        return _run(["diff", "--no-index", "--no-color", "/dev/null", path], root, check=False)
+        # os.devnull rather than a hardcoded "/dev/null" — the latter
+        # doesn't exist on Windows (it's "NUL" there).
+        return _run(["diff", "--no-index", "--no-color", os.devnull, path], root, check=False)
     except GitError:
         return ""
 

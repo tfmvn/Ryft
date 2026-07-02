@@ -111,10 +111,10 @@ PTK_STYLE = PTKStyle.from_dict({
 _I = {
     "dot":     "·",   "arrow":   "›",   "bullet":  "▸",
     "check":   "✓",   "cross":   "✗",   "warn":    "⚑",
-    "commit":  "",  "push":    "↑",   "pull":    "↓",
+    "commit":  "●",   "push":    "↑",   "pull":    "↓",
     "format":  "◈",   "analyze": "◉",   "sync":    "⟳",
     "model":   "⬡",   "file":    "◻",   "folder":  "◼",
-    "git":     "",  "branch":  "",  "star":    "★",
+    "git":     "⬢",   "branch":  "⬢",   "star":    "★",
     "spark":   "◆",   "add":     "+",   "del":     "−",
     "hunk":    "⌗",   "ctx":     " ",
 }
@@ -492,6 +492,7 @@ class KyteApp:
                  if git.is_repo(cfg.root) else {})
         return NestedCompleter.from_nested_dict({
             "/help": None, "/status": None, "/activity": None,
+            "/init": None,
             "/watch": None,
             "/sync":    {"start": None, "stop": None, "status": None},
             "/format":  {".": None, "changed": None},
@@ -1346,7 +1347,7 @@ _CMD_GROUPS: dict[str, list[str]] = {
     "git"     : ["commit", "push", "pull", "diff", "log", "git"],
     "ai"      : ["analyze", "review", "message", "model"],
     "sync"    : ["watch", "sync", "format"],
-    "project" : ["status", "doctor", "config", "tree", "files", "root"],
+    "project" : ["init", "status", "doctor", "config", "tree", "files", "root"],
     "shell"   : ["help", "activity", "exit"],
 }
 

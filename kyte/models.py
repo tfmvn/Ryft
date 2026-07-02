@@ -73,28 +73,11 @@ class ActivityEvent:
     def time_str(self) -> str:
         return time.strftime("%H:%M", time.localtime(self.at))
 
-    @property
-    def icon(self) -> str:
-        msg_lower = self.message.lower()
-        if "commit" in msg_lower: return ""
-        if "push" in msg_lower: return "󰊢"
-        if "format" in msg_lower: return "󰄬"
-        if "review" in msg_lower or "analyz" in msg_lower: return ""
-        return {
-            "info": "●",
-            "success": "✓",
-            "warn": "⚠",
-            "error": "✗",
-        }.get(self.level, "●")
-
-    @property
-    def color(self) -> str:
-        return {
-            "info": "#ae80ff",
-            "success": "green",
-            "warn": "yellow",
-            "error": "red",
-        }.get(self.level, "white")
+    # NOTE: icon/colour rendering lives in ui._icon_color(), which is the
+    # single source of truth the UI actually calls. An older icon/color
+    # pair used to live here too but had gone stale (some glyphs required
+    # a Nerd Font and had silently degraded to empty strings) and nothing
+    # in the codebase referenced it — removed rather than fixed in place.
 
 
 @dataclass

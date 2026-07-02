@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "kyte"
-version = "1.0.0"
+dynamic = ["version"]
 description = "A calm, fast terminal companion for git — AI commit messages, live sync, and one-command onboarding."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -24,11 +24,18 @@ dependencies = [
     "watchdog>=3.0",
 ]
 
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
 [project.urls]
 Homepage = "https://github.com/kyte-dev/kyte"
+Issues = "https://github.com/kyte-dev/kyte/issues"
 
 [project.scripts]
 kyte = "kyte.__main__:main"
+
+[tool.setuptools.dynamic]
+version = { attr = "kyte.__version__" }
 
 [tool.setuptools.packages.find]
 include = ["kyte*"]

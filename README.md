@@ -36,14 +36,22 @@ kyte              # interactive session — type /help for commands
 kyte doctor       # run one command and exit, e.g. from a script or CI
 kyte commit
 kyte watch
+kyte --help       # usage summary
+kyte --version    # installed version
 ```
+
+Running a single command (anything after `kyte`) never blocks on a prompt —
+if there's no `.src.py` yet it proceeds on sane defaults instead of asking,
+so it's safe to call from scripts and CI. Run `kyte init` first if you want
+the interactive setup walkthrough.
 
 Inside the interactive session, everything is a slash command:
 
 ```
-/status            project status at a glance
-/commit             commit all changed files, AI messages generated in parallel
-/push  /pull        publish or fetch
+/status             project status at a glance
+/init                set up Kyte in this project (safe to re-run)
+/commit              commit all changed files, AI messages generated in parallel
+/push  /pull         publish or fetch
 /diff  /diff <file>  GitHub-style diff, scrollable
 /review <file>       AI code review
 /analyze             AI summary of everything that changed
@@ -77,7 +85,7 @@ it — you're never left guessing what to do next.
 ## Development
 
 ```bash
-pip install -e .
+pip install -e ".[dev]"
 pytest
 ```
 

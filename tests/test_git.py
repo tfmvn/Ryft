@@ -95,6 +95,16 @@ def test_log_no_commits_is_empty(repo):
     assert git.log(repo) == ""
 
 
+def test_diff_for_untracked_file_uses_no_index_fallback(repo):
+    # A file that's never been `git add`ed shows up in neither `git diff`
+    # nor `git diff --cached` — diff_for falls back to `git diff --no-index`
+    # against the OS's null device to still show its content as an addition.
+    f = repo / "new_file.py"
+    f.write_text("x = 1\n")
+    diff = git.diff_for(repo, "new_file.py")
+    assert "+x = 1" in diff
+
+
 def test_push_pull_raise_gitError_without_remote(repo):
     with pytest.raises(git.GitError):
         git.push(repo, "origin", "main")
