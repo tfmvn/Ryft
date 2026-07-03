@@ -96,19 +96,61 @@ def create_branch(root: Path, branch: str) -> str:
     return _run(["checkout", "-b", branch], root)
 
 
-def changed_files(root: Path) -> list[FileChange]:
-    """Parse `git status --porcelain` into a flat list of changed files."""
+def _toplevel(root: Path) -> Path | None:
     try:
-        out = _run(["status", "--porcelain"], root)
+        out = _run(["rev-parse", "--show-toplevel"], root, check=False)
+    except GitError:
+        return None
+    out = out.strip()
+    return Path(out) if out else None
+
+
+def changed_files(root: Path) -> list[FileChange]:
+    """Parse `git status --porcelain` into a flat list of changed files,
+    with paths normalized to be relative to *root*.
+
+    Whether git reports status paths relative to `cwd` or relative to the
+    repo's top-level directory is controlled by the `status.relativePaths`
+    git config (default true = relative to cwd) — which can be overridden
+    globally/system-wide outside our control. If *root* isn't itself the
+    git top-level (e.g. it's a subdirectory that git discovered `.git` in
+    by walking upward), that config can make every reported path carry an
+    unexpected prefix (or lack one), silently breaking any code here that
+    assumed "git's output == relative to root".
+
+    To make this deterministic, we force toplevel-relative output
+    ourselves via `-c status.relativePaths=false`, then re-derive each
+    path relative to *root* in Python — so the result is always relative
+    to *root*, regardless of local git config or whether root is the
+    actual top-level.
+    """
+    try:
+        out = _run(
+            ["-c", "status.relativePaths=false", "status", "--porcelain"], root
+        )
     except GitError:
         return []
+
+    toplevel = _toplevel(root)
+
     changes: list[FileChange] = []
     for line in out.splitlines():
         if not line.strip():
             continue
         code = line[:2].strip()
-        path = line[3:].strip().strip('"')
+        raw_path = line[3:].strip().strip('"')
         status = "?" if code in ("??", "?") else code[0] if code[0] != " " else code[1]
+
+        path = raw_path
+        if toplevel is not None:
+            try:
+                abs_path = (toplevel / raw_path).resolve()
+                path = str(abs_path.relative_to(root.resolve()))
+            except (ValueError, OSError):
+                # root isn't actually inside toplevel for some reason —
+                # fall back to the toplevel-relative path as-is.
+                path = raw_path
+
         changes.append(FileChange(path=path, status=status or "M"))
     return changes
 

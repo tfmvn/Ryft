@@ -17,6 +17,7 @@ if TYPE_CHECKING:
 try:
     from watchdog.events import FileSystemEventHandler
     from watchdog.observers import Observer
+
     WATCHDOG_AVAILABLE = True
 except ImportError:
     WATCHDOG_AVAILABLE = False
@@ -25,9 +26,9 @@ except ImportError:
 
 def run_commit_pipeline(ctx: "AppContext", path: Path, push: bool) -> bool:
     """Format → diff → AI message → commit → (optional) push for ONE file."""
-    cfg    = ctx.config
-    root   = cfg.root
-    rel    = human_path(path, root)
+    cfg = ctx.config
+    root = cfg.root
+    rel = human_path(path, root)
     status = ctx.sync_status
 
     status.busy = True
@@ -37,17 +38,30 @@ def run_commit_pipeline(ctx: "AppContext", path: Path, push: bool) -> bool:
     try:
         if cfg.formatter.enabled and path.exists():
             try:
-                if formatter.format_file(path, max_blank_lines=cfg.formatter.max_blank_lines):
+                if formatter.format_file(
+                    path, max_blank_lines=cfg.formatter.max_blank_lines
+                ):
                     ctx.activity.add(f"Formatted {rel}", "info")
             except Exception as exc:
                 ctx.activity.add(f"Format failed on {rel}: {exc}", "error")
 
         changed = {c.path for c in git.changed_files(root)}
         if rel not in changed:
+            print("RETURN: rel not in changed")
+            print("REL:", repr(rel))
+            print("PATH (raw event):", repr(str(path)))
+            print("PATH.resolve():", repr(str(path.resolve())) if path.exists() else "(gone)")
+            print("ROOT:", repr(str(root)))
+            print("ROOT.resolve():", repr(str(root.resolve())))
+            print("CHANGED:", sorted(changed))
+            ctx.activity.add(
+                f"Sync skipped {rel} (git changed={sorted(changed)})",
+                "warn",
+            )
             return False
 
         status.current_stage = "message"
-        diff   = git.diff_for(root, rel)
+        diff = git.diff_for(root, rel)
         client = ai.make_commit_client(cfg.ollama)
         message, source = ai.generate_commit_message(
             client,
@@ -64,6 +78,10 @@ def run_commit_pipeline(ctx: "AppContext", path: Path, push: bool) -> bool:
         try:
             git.commit_file(root, rel, message)
         except git.GitError as exc:
+            print("RETURN: commit failed")
+            print("REL:", repr(rel))
+            print("ROOT:", repr(str(root)))
+            print("GitError:", exc)
             ctx.activity.add(f"Commit failed on {rel}: {exc}", "error")
             return False
 
@@ -80,7 +98,9 @@ def run_commit_pipeline(ctx: "AppContext", path: Path, push: bool) -> bool:
                 git.push(root, cfg.git.remote, cfg.git.branch)
                 status.last_push_time = time.time()
                 status.current_stage = "pushed"
-                ctx.activity.add(f"Pushed {rel} to {cfg.git.remote}/{cfg.git.branch}", "success")
+                ctx.activity.add(
+                    f"Pushed {rel} to {cfg.git.remote}/{cfg.git.branch}", "success"
+                )
                 time.sleep(1.2)  # let the toolbar show "pushed ✓" briefly
             except git.GitError as exc:
                 ctx.activity.add(f"Push failed: {exc}", "error")
@@ -100,7 +120,7 @@ class _Handler(FileSystemEventHandler):
 
     def _on_change(self, src_path: str) -> None:
         path = Path(src_path)
-        cfg  = self.ctx.config
+        cfg = self.ctx.config
         if path.is_dir() or is_ignored(path, cfg.root, cfg.ignore):
             return
         delay = cfg.sync.debounce_seconds
@@ -116,13 +136,26 @@ class _Handler(FileSystemEventHandler):
     def _fire(self, src_path: str) -> None:
         with self._lock:
             self._timers.pop(src_path, None)
-        run_commit_pipeline(self.ctx, Path(src_path), push=self.ctx.config.sync.push)
+
+        try:
+            print(f"SYNC FIRE: {src_path}")
+            result = run_commit_pipeline(
+                self.ctx,
+                Path(src_path),
+                push=self.ctx.config.sync.push,
+            )
+            print(f"SYNC RESULT: {result}")
+        except Exception:
+            import traceback
+
+            traceback.print_exc()
 
     def on_created(self, event):
         if not event.is_directory:
             self._on_change(event.src_path)
 
     def on_modified(self, event):
+        print("EVENT:", event.src_path)
         if not event.is_directory:
             self._on_change(event.src_path)
 
@@ -141,7 +174,7 @@ class SyncController:
             return "watchdog is not installed — run: pip install watchdog"
         if self.is_running:
             return "Sync is already running."
-        handler  = _Handler(self.ctx)
+        handler = _Handler(self.ctx)
         observer = Observer()
         observer.schedule(handler, str(self.ctx.config.root), recursive=True)
         observer.start()
