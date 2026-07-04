@@ -12,6 +12,7 @@ import sys
 from pathlib import Path
 
 from . import ai, commands, config, onboarding, ui
+from .logging_setup import configure_logging
 from .models import AppContext
 from .sync import SyncController
 from .utils import ActivityFeed
@@ -89,6 +90,8 @@ def build_context(interactive: bool = True, quiet: bool = False) -> tuple[AppCon
     else:
         root = config.find_root(cwd) or cwd
         cfg = config.load_config(root)
+
+    configure_logging(cfg.root)
 
     client = _build_ai_client(cfg)
     ctx = AppContext(config=cfg, ai=client, activity=ActivityFeed(), console=None)

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 from typing import TypeVar, cast
 
@@ -9,6 +10,8 @@ from .models import (
     Config, FormatterConfig, GitConfig,
     OllamaConfig, ProjectConfig, SyncConfig,
 )
+
+logger = logging.getLogger(__name__)
 
 T = TypeVar("T")
 
@@ -95,7 +98,12 @@ def _exec_config(cfg_path: Path) -> dict:
         code = compile(source, str(cfg_path), "exec")
         exec(code, namespace)
     except Exception:
-        # Bad/unparsable config → fall back to defaults rather than crash.
+        # .src.py is arbitrary, user-authored Python (see module docstring
+        # above) — it can raise literally anything, so this stays a
+        # catch-all by necessity rather than oversight. It's logged now
+        # instead of silently discarded, while still falling back to
+        # defaults so a bad config file can never crash the CLI.
+        logger.warning("Failed to execute %s — falling back to defaults", cfg_path, exc_info=True)
         return {}
     return namespace
 

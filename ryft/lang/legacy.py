@@ -1,15 +1,22 @@
-"""Formatting. Currently one formatter (Python comment stripping +
-blank-line collapsing) but built so another language could register an
-extension -> processor mapping without restructuring anything.
+"""Ryft's original Python/Lua comment-and-blank-line formatters,
+unchanged from the pre-refactor `formatter.py`.
+
+Kept here verbatim for two reasons:
+
+1. Backwards compatibility — `ryft.formatter` still re-exports
+   `PythonCommentRemover` / `LuaCommentRemover` under their original
+   names, in case anything (including existing tests) imports them
+   directly.
+2. Reuse — `lang/python_lang.py` and `lang/lua_lang.py` wrap these as
+   the comment-stripping step of the new pipeline, instead of
+   duplicating the logic.
 """
 
 from __future__ import annotations
 
-import ast
 import io
-import tokenize
 import re
-from pathlib import Path
+import tokenize
 
 
 class PythonCommentRemover:
@@ -75,6 +82,7 @@ class PythonCommentRemover:
 
 class LuaCommentRemover:
     extensions = (".lua",)
+
     def __init__(self, max_blank_lines: int = 2, remove_comments: bool = True) -> None:
         self.max_blank_lines = max_blank_lines
         self.remove_comments = remove_comments
@@ -84,46 +92,3 @@ class LuaCommentRemover:
             source = re.sub(r'--\[\[.*?\]\]', '', source, flags=re.DOTALL)
             source = re.sub(r'--.*', '', source)
         return PythonCommentRemover(self.max_blank_lines)._collapse_blanks(source.splitlines(keepends=True))
-    
-
-FORMATTERS = {
-    ".py": PythonCommentRemover,
-    ".lua": LuaCommentRemover
-}
-
-
-def format_file(path: Path, max_blank_lines: int = 2, remove_comments: bool = True) -> bool:
-    """Format one file in place. Returns True if it changed."""
-    cls = FORMATTERS.get(path.suffix.lower())
-    if cls is None:
-        return False
-
-    try:
-        source = path.read_text(encoding="utf-8")
-    except (OSError, UnicodeDecodeError):
-        return False
-
-    processor = cls(max_blank_lines=max_blank_lines, remove_comments=remove_comments)
-    cleaned = processor.process(source)
-    
-    if cleaned == source:
-        return False
-    
-    if path.suffix.lower() == ".py":
-        try:
-            ast.parse(cleaned)
-        except SyntaxError:
-            return False 
-    
-    tmp = path.with_suffix(path.suffix + ".tmp")
-    tmp.write_text(cleaned, encoding="utf-8")
-    tmp.replace(path)
-    return True
-
-# src/formatter.py
-def format_paths(paths: list[Path], max_blank_lines: int = 2, remove_comments: bool = True) -> list[Path]:
-    changed = []
-    for p in paths:
-        if format_file(p, max_blank_lines=max_blank_lines, remove_comments=remove_comments):
-            changed.append(p)
-    return changed

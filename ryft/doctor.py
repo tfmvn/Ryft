@@ -57,8 +57,8 @@ def _git_installed_check() -> DoctorCheck:
     )
 
 
-def _repo_check(root: Path) -> DoctorCheck:
-    if git.is_repo(root):
+def _repo_check(root: Path, is_repo: bool) -> DoctorCheck:
+    if is_repo:
         return DoctorCheck("Current repository", "ok", str(root))
     return DoctorCheck(
         "Current repository", "fail", f"{root} is not a git repository",
@@ -68,8 +68,8 @@ def _repo_check(root: Path) -> DoctorCheck:
     )
 
 
-def _remote_check(root: Path, remote: str) -> DoctorCheck:
-    if not git.is_repo(root):
+def _remote_check(root: Path, remote: str, is_repo: bool) -> DoctorCheck:
+    if not is_repo:
         return DoctorCheck("Remote origin", "warn", "skipped (no repository)")
     if git.has_remote(root, remote):
         url = git.remote_url(root, remote) or "(url unavailable)"
@@ -81,8 +81,8 @@ def _remote_check(root: Path, remote: str) -> DoctorCheck:
     )
 
 
-def _branch_check(root: Path, branch: str) -> DoctorCheck:
-    if not git.is_repo(root):
+def _branch_check(root: Path, branch: str, is_repo: bool) -> DoctorCheck:
+    if not is_repo:
         return DoctorCheck("Current branch", "warn", "skipped (no repository)")
     current = git.current_branch(root)
     if current not in ("(none)", "(detached)"):
@@ -167,8 +167,8 @@ def _permissions_check(root: Path) -> DoctorCheck:
     )
 
 
-def _repo_state_check(root: Path) -> DoctorCheck:
-    if not git.is_repo(root):
+def _repo_state_check(root: Path, is_repo: bool) -> DoctorCheck:
+    if not is_repo:
         return DoctorCheck("Repository state", "warn", "skipped (no repository)")
     if git.is_locked(root):
         return DoctorCheck(
@@ -183,20 +183,27 @@ def _repo_state_check(root: Path) -> DoctorCheck:
 
 
 def run_doctor(ctx: "AppContext") -> list[DoctorCheck]:
-    """Run every check and return the results, in display order."""
+    """Run every check and return the results, in display order.
+
+    `is_repo` is resolved once here and threaded through to every check
+    that needs it, instead of each of the four repo-dependent checks
+    below independently re-running `git rev-parse` to ask the same
+    question.
+    """
     cfg = ctx.config
+    is_repo = git.is_repo(cfg.root)
     return [
         _python_check(),
         _git_installed_check(),
-        _repo_check(cfg.root),
-        _remote_check(cfg.root, cfg.git.remote),
-        _branch_check(cfg.root, cfg.git.branch),
+        _repo_check(cfg.root, is_repo),
+        _remote_check(cfg.root, cfg.git.remote, is_repo),
+        _branch_check(cfg.root, cfg.git.branch, is_repo),
         _ollama_installed_check(),
         _ollama_connectivity_check(cfg.ollama),
         _models_check(cfg.ollama),
         _config_check(ctx),
         _permissions_check(cfg.root),
-        _repo_state_check(cfg.root),
+        _repo_state_check(cfg.root, is_repo),
     ]
 
 

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
@@ -11,8 +12,10 @@ from rich.tree import Tree  # type: ignore[import]
 from . import ai, config as config_mod, doctor as doctor_mod, formatter, git, onboarding, recovery, ui
 from .config import DEFAULT_IGNORE
 from .models import CommandSpec
-from .sync import run_commit_pipeline  # used by sync watcher
+from .pipeline import CommitPipeline
 from .utils import discover_files, human_path
+
+logger = logging.getLogger(__name__)
 
 # In src/commands.py
 SUPPORTED_SUFFIXES = {".py", ".lua"}
@@ -169,23 +172,14 @@ def cmd_message(ctx, args: list[str]) -> None:
         ui.error("Usage: /message <file>")
         return
     file = args[0]
-    diff = git.diff_for(cfg.root, file)
+    pipeline = CommitPipeline(cfg)
+    diff = pipeline.diff_for(file)
     if not diff.strip():
         ui.info(f"No changes in {file}.")
         return
 
-    client = ai.make_commit_client(cfg.ollama)
     with ui.TaskSpinner(ctx, f"Generating message for {file}…") as spin:
-        message, source = ai.generate_commit_message(
-            client,
-            cfg.ollama.enabled,
-            cfg.git.fallback_commit_message,
-            file,
-            diff,
-            root=cfg.root,
-            auto_threshold=cfg.git.small_change_threshold,
-            use_auto_small=cfg.git.auto_commit_small_changes,
-        )
+        message, source = pipeline.generate_message(file, diff)
         spin.step("Message generated")
 
     ui.info(f"{message}  [via {source}]")
@@ -210,19 +204,9 @@ def cmd_model(ctx, args: list[str]) -> None:
 # Git — commit (parallel message generation + live tree)
 # ---------------------------------------------------------------------------
 
-def _generate_message_for(fname: str, diff: str, cfg, root: Path) -> tuple[str, str, str]:
+def _generate_message_for(pipeline: CommitPipeline, fname: str, diff: str) -> tuple[str, str, str]:
     """Worker: returns (fname, message, source). Runs in a thread pool."""
-    client = ai.make_commit_client(cfg.ollama)
-    message, source = ai.generate_commit_message(
-        client,
-        cfg.ollama.enabled,
-        cfg.git.fallback_commit_message,
-        fname,
-        diff,
-        root=root,
-        auto_threshold=cfg.git.small_change_threshold,
-        use_auto_small=cfg.git.auto_commit_small_changes,
-    )
+    message, source = pipeline.generate_message(fname, diff)
     return fname, message, source
 
 
@@ -235,13 +219,11 @@ def _do_commit(ctx) -> None:
             ui.warn("Commit needs a git repository. Run '/doctor fix' when you're ready.")
             return
 
+    pipeline = CommitPipeline(cfg)
+
     # ── 1. collect changed files ──────────────────────────────────────────────
     with ui.TaskSpinner(ctx, "Scanning for changes…"):
-        all_changes = git.changed_files(root)
-        changes = [
-            c for c in all_changes
-            if not config_mod.is_ignored(root / c.path, root, cfg.ignore)
-        ]
+        changes = pipeline.scan()
 
     if not changes:
         ui.info("Nothing to commit.")
@@ -254,18 +236,15 @@ def _do_commit(ctx) -> None:
     diffs: dict[str, str] = {}
     with ui.TaskSpinner(ctx, "Reading diffs…"):
         for fname in filenames:
-            diffs[fname] = git.diff_for(root, fname)
+            diffs[fname] = pipeline.diff_for(fname)
 
     # ── 3. format all files first (fast, no AI) ───────────────────────────────
     if cfg.formatter.enabled:
         with ui.TaskSpinner(ctx, "Formatting…"):
             for fname in filenames:
-                path = root / fname
-                if path.exists():
-                    try:
-                        formatter.format_file(path, max_blank_lines=cfg.formatter.max_blank_lines)
-                    except Exception:
-                        pass
+                _changed, fmt_error = pipeline.format_file(fname)
+                if fmt_error:
+                    logger.warning("Format failed on %s during commit: %s", fname, fmt_error)
 
     # ── 4. parallel message generation + live tree UI ────────────────────────
     # messages dict is populated as futures complete
@@ -289,7 +268,7 @@ def _do_commit(ctx) -> None:
 
         with ThreadPoolExecutor(max_workers=workers) as pool:
             futures = {
-                pool.submit(_generate_message_for, fname, diffs[fname], cfg, root): fname
+                pool.submit(_generate_message_for, pipeline, fname, diffs[fname]): fname
                 for fname in filenames
             }
             for future in as_completed(futures):
@@ -304,7 +283,7 @@ def _do_commit(ctx) -> None:
             ))
             view.set_stage(fname, "commit", "active")
             try:
-                git.commit_file(root, fname, message)
+                pipeline.commit(fname, message)
                 tag = "" if source == "ollama" else f" ({source})"
                 ctx.activity.add(f"Committed {fname}: {message}{tag}", "success")
                 view.set_stage(fname, "commit", "done")
@@ -327,12 +306,13 @@ def _do_push(ctx) -> None:
     cfg    = ctx.config
     remote = cfg.git.remote
     branch = cfg.git.branch
+    pipeline = CommitPipeline(cfg)
 
     result: dict = {}
 
     def _run_push():
         try:
-            result["out"] = git.push(cfg.root, remote, branch)
+            result["out"] = pipeline.push()
             result["ok"]  = True
         except git.GitError as exc:
             result["err"] = str(exc)
@@ -395,9 +375,7 @@ def _do_log(ctx) -> None:
     ui.render_text("Git Log", out or "No commits yet.")
 
 def _do_status(ctx) -> None:
-    cfg = ctx.config
-    all_changes = git.changed_files(cfg.root)
-    changes = [c for c in all_changes if not config_mod.is_ignored(cfg.root / c.path, cfg.root, cfg.ignore)]
+    changes = CommitPipeline(ctx.config).scan()
     ui.render_git_changes(changes)
 
 def cmd_commit(ctx, args: list[str]) -> None: _do_commit(ctx)
@@ -450,6 +428,12 @@ def cmd_doctor(ctx, args: list[str]) -> None:
         try:
             ok = check.auto_fix()
         except Exception as exc:
+            # auto_fix callables come from a heterogeneous set of
+            # recovery.ensure_* helpers (git init, branch creation, model
+            # pulls, config writes, ...) — there's no single expected
+            # exception type to narrow to here, so this stays a catch-all,
+            # but it's logged rather than only shown once and discarded.
+            logger.exception("Doctor auto-fix failed for %s", check.name)
             ui.error(f"{check.name}: fix failed — {exc}")
             continue
         if ok:
@@ -565,6 +549,13 @@ def _execute(ctx, name: str, args: list[str], label: str) -> None:
     try:
         spec.handler(ctx, args)
     except Exception as exc:
+        # Command handlers are a plugin-style registry covering ~25
+        # unrelated features — this top-level catch-all is the last line
+        # of defense against a handler bug taking down the whole REPL, so
+        # it stays broad by design, but the failure is now logged (with a
+        # traceback) instead of only ever surfacing as a one-line message
+        # to the user.
+        logger.exception("Command %s failed", label)
         ui.error(f"{label} failed: {exc}")
 
 

@@ -7,6 +7,7 @@ from __future__ import annotations
 import os
 import shutil
 import subprocess
+import time
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -226,3 +227,54 @@ def pull(root: Path, remote: str, branch: str) -> str:
 
 def log(root: Path, n: int = 10) -> str:
     return _run(["log", f"-{n}", "--oneline", "--decorate"], root, check=False)
+
+
+# ---------------------------------------------------------------------------
+# Status cache
+# ---------------------------------------------------------------------------
+
+class StatusCache:
+    """Short-TTL cache for read-only git status queries.
+
+    Several read-only queries (is_repo, current_branch, changed_files) get
+    called repeatedly in quick succession from the same logical operation
+    -- e.g. the REPL's bottom toolbar re-renders on every 0.5s UI tick, and
+    `ryft doctor` asks "is this a repo?" from four independent checks.
+    Each call shells out to a fresh `git` subprocess, so without caching,
+    idle time in the REPL alone spawns several git processes a second for
+    no reason. This cache gives those call sites a short-lived,
+    invalidate-able snapshot instead, without changing what any of them
+    return.
+
+    Not a general-purpose cache: only wraps queries that are safe to serve
+    slightly stale (informational display, not correctness-critical
+    decisions). Call `invalidate()` after any operation that changes
+    repository state (commit, push, pull, branch creation, ...) so the
+    next read reflects reality immediately.
+    """
+
+    def __init__(self, root: Path, ttl: float = 1.5) -> None:
+        self.root = root
+        self.ttl = ttl
+        self._cache: dict[str, tuple[float, object]] = {}
+
+    def _cached(self, key: str, fn):
+        now = time.monotonic()
+        hit = self._cache.get(key)
+        if hit is not None and now - hit[0] < self.ttl:
+            return hit[1]
+        value = fn()
+        self._cache[key] = (now, value)
+        return value
+
+    def is_repo(self) -> bool:
+        return self._cached("is_repo", lambda: is_repo(self.root))
+
+    def current_branch(self) -> str:
+        return self._cached("current_branch", lambda: current_branch(self.root))
+
+    def changed_files(self) -> list[FileChange]:
+        return self._cached("changed_files", lambda: changed_files(self.root))
+
+    def invalidate(self) -> None:
+        self._cache.clear()

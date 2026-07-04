@@ -1,14 +1,23 @@
-"""Sync mode: watch for saves, run format → message → commit → push."""
+"""Sync mode: watch for saves, run format -> message -> commit -> push.
+
+The actual format/diff/message/commit/push work is delegated to
+`CommitPipeline` (see pipeline.py) -- the exact same pipeline the manual
+`/commit` command uses -- so this module is only responsible for
+watchdog plumbing (debouncing filesystem events) and updating the
+sync-specific UI state (`ctx.sync_status`, the activity feed).
+"""
 
 from __future__ import annotations
 
+import logging
 import threading
 import time
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from . import ai, formatter, git
+from . import git
 from .config import is_ignored
+from .pipeline import CommitPipeline
 from .utils import human_path
 
 if TYPE_CHECKING:
@@ -23,65 +32,51 @@ except ImportError:
     WATCHDOG_AVAILABLE = False
     FileSystemEventHandler = object  # type: ignore[assignment,misc]
 
+logger = logging.getLogger(__name__)
+
 
 def run_commit_pipeline(ctx: "AppContext", path: Path, push: bool) -> bool:
-    """Format → diff → AI message → commit → (optional) push for ONE file."""
+    """Format -> diff -> AI message -> commit -> (optional) push for ONE
+    file, via the shared CommitPipeline. Also updates `ctx.sync_status`
+    (consumed by the REPL's bottom toolbar) and the activity feed --
+    bookkeeping that only the sync watcher needs."""
     cfg = ctx.config
     root = cfg.root
     rel = human_path(path, root)
     status = ctx.sync_status
+    pipeline = CommitPipeline(cfg)
 
     status.busy = True
     status.current_file = rel
     status.current_stage = "format"
 
     try:
-        if cfg.formatter.enabled and path.exists():
-            try:
-                if formatter.format_file(
-                    path, max_blank_lines=cfg.formatter.max_blank_lines
-                ):
-                    ctx.activity.add(f"Formatted {rel}", "info")
-            except Exception as exc:
-                ctx.activity.add(f"Format failed on {rel}: {exc}", "error")
+        changed, fmt_error = pipeline.format_file(rel)
+        if changed:
+            ctx.activity.add(f"Formatted {rel}", "info")
+        elif fmt_error:
+            ctx.activity.add(f"Format failed on {rel}: {fmt_error}", "error")
 
-        changed = {c.path for c in git.changed_files(root)}
-        if rel not in changed:
-            print("RETURN: rel not in changed")
-            print("REL:", repr(rel))
-            print("PATH (raw event):", repr(str(path)))
-            print("PATH.resolve():", repr(str(path.resolve())) if path.exists() else "(gone)")
-            print("ROOT:", repr(str(root)))
-            print("ROOT.resolve():", repr(str(root.resolve())))
-            print("CHANGED:", sorted(changed))
+        changed_files = {c.path for c in pipeline.scan(refresh=True)}
+        if rel not in changed_files:
+            logger.debug(
+                "Sync skip %s: not in changed set (path=%s, root=%s, changed=%s)",
+                rel, path, root, sorted(changed_files),
+            )
             ctx.activity.add(
-                f"Sync skipped {rel} (git changed={sorted(changed)})",
-                "warn",
+                f"Sync skipped {rel} (not detected as changed)", "warn"
             )
             return False
 
         status.current_stage = "message"
-        diff = git.diff_for(root, rel)
-        client = ai.make_commit_client(cfg.ollama)
-        message, source = ai.generate_commit_message(
-            client,
-            cfg.ollama.enabled,
-            cfg.git.fallback_commit_message,
-            rel,
-            diff,
-            root=root,
-            auto_threshold=cfg.git.small_change_threshold,
-            use_auto_small=cfg.git.auto_commit_small_changes,
-        )
+        diff = pipeline.diff_for(rel)
+        message, source = pipeline.generate_message(rel, diff)
 
         status.current_stage = "commit"
         try:
-            git.commit_file(root, rel, message)
+            pipeline.commit(rel, message)
         except git.GitError as exc:
-            print("RETURN: commit failed")
-            print("REL:", repr(rel))
-            print("ROOT:", repr(str(root)))
-            print("GitError:", exc)
+            logger.error("Commit failed on %s: %s", rel, exc)
             ctx.activity.add(f"Commit failed on {rel}: {exc}", "error")
             return False
 
@@ -95,7 +90,7 @@ def run_commit_pipeline(ctx: "AppContext", path: Path, push: bool) -> bool:
         if push:
             status.current_stage = "push"
             try:
-                git.push(root, cfg.git.remote, cfg.git.branch)
+                pipeline.push()
                 status.last_push_time = time.time()
                 status.current_stage = "pushed"
                 ctx.activity.add(
@@ -103,6 +98,7 @@ def run_commit_pipeline(ctx: "AppContext", path: Path, push: bool) -> bool:
                 )
                 time.sleep(1.2)  # let the toolbar show "pushed ✓" briefly
             except git.GitError as exc:
+                logger.error("Push failed: %s", exc)
                 ctx.activity.add(f"Push failed: {exc}", "error")
 
         return True
@@ -137,25 +133,29 @@ class _Handler(FileSystemEventHandler):
         with self._lock:
             self._timers.pop(src_path, None)
 
+        logger.debug("Sync fire: %s", src_path)
         try:
-            print(f"SYNC FIRE: {src_path}")
             result = run_commit_pipeline(
                 self.ctx,
                 Path(src_path),
                 push=self.ctx.config.sync.push,
             )
-            print(f"SYNC RESULT: {result}")
+            logger.debug("Sync result for %s: %s", src_path, result)
         except Exception:
-            import traceback
-
-            traceback.print_exc()
+            # Runs on a watchdog-owned timer thread with nothing above it
+            # to catch a failure -- an uncaught exception here would just
+            # silently kill this debounce timer with no user-visible
+            # sign anything went wrong, so log the full traceback and
+            # move on rather than letting a bug in one commit cycle break
+            # every commit cycle after it.
+            logger.exception("Unhandled error in sync pipeline for %s", src_path)
 
     def on_created(self, event):
         if not event.is_directory:
             self._on_change(event.src_path)
 
     def on_modified(self, event):
-        print("EVENT:", event.src_path)
+        logger.debug("Watchdog event: %s", event.src_path)
         if not event.is_directory:
             self._on_change(event.src_path)
 

@@ -14,6 +14,7 @@ Key improvements over v2:
 
 from __future__ import annotations
 
+import logging
 import os
 import re
 import threading
@@ -48,6 +49,8 @@ from . import git, commands
 
 if TYPE_CHECKING:
     from .models import AppContext
+
+logger = logging.getLogger(__name__)
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # Palette
@@ -485,11 +488,19 @@ class RyftApp:
     def __init__(self, ctx: "AppContext", first_run: bool = False) -> None:
         self.ctx = ctx
         self.first_run = first_run
+        # The bottom toolbar re-renders on every 0.5s UI tick (see
+        # _refresh_loop below) and calls is_repo/current_branch/
+        # changed_files every time; without this cache that's 3 fresh
+        # `git` subprocesses spawned twice a second just sitting idle at
+        # the prompt. invalidate() is called after every dispatched
+        # command so the toolbar reflects state changes immediately.
+        self._status_cache = git.StatusCache(ctx.config.root)
 
     def _completer(self) -> NestedCompleter:
         cfg   = self.ctx.config
-        files = ({c.path: None for c in git.changed_files(cfg.root)}
-                 if git.is_repo(cfg.root) else {})
+        cache = self._status_cache
+        files = ({c.path: None for c in cache.changed_files()}
+                 if cache.is_repo() else {})
         return NestedCompleter.from_nested_dict({
             "/help": None, "/status": None, "/activity": None,
             "/init": None,
@@ -512,9 +523,10 @@ class RyftApp:
 
     def _toolbar(self) -> FormattedText:
         cfg      = self.ctx.config
-        is_repo  = git.is_repo(cfg.root)
+        cache    = self._status_cache
+        is_repo  = cache.is_repo()
         sync_on  = self.ctx.sync and self.ctx.sync.is_running
-        branch   = git.current_branch(cfg.root) if is_repo else "—"
+        branch   = cache.current_branch() if is_repo else "—"
         model    = cfg.ollama.model.split(":")[0]
         sep      = ("class:bottom-toolbar.sep", "  │  ")
         sstatus  = self.ctx.sync_status
@@ -527,7 +539,7 @@ class RyftApp:
         ]
 
         if not sync_on:
-            n = len(git.changed_files(cfg.root)) if is_repo else 0
+            n = len(cache.changed_files()) if is_repo else 0
             git_lbl = f"{n} modified" if n else "clean"
             parts += [
                 ("class:bottom-toolbar.accent", "⬡ "),
@@ -590,10 +602,11 @@ class RyftApp:
     def _splash(self) -> None:
         clear()
         cfg     = self.ctx.config
-        is_repo = git.is_repo(cfg.root)
-        n       = len(git.changed_files(cfg.root)) if is_repo else 0
+        cache   = self._status_cache
+        is_repo = cache.is_repo()
+        n       = len(cache.changed_files()) if is_repo else 0
         ai_ok   = self.ctx.ai.is_available()
-        branch  = git.current_branch(cfg.root) if is_repo else "—"
+        branch  = cache.current_branch() if is_repo else "—"
 
         console.print()
         wm = Text()
@@ -641,7 +654,11 @@ class RyftApp:
                     try:
                         session.app.invalidate()
                     except Exception:
-                        pass
+                        # Purely cosmetic: a failed UI invalidation during
+                        # a teardown race shouldn't crash the refresh
+                        # thread, but it's still worth a trace if it ever
+                        # happens repeatedly.
+                        logger.debug("Toolbar refresh invalidate failed", exc_info=True)
 
             refresher = threading.Thread(target=_refresh_loop, daemon=True)
             refresher.start()
@@ -655,7 +672,14 @@ class RyftApp:
                 try:
                     commands.dispatch(self.ctx, raw)
                 except Exception as exc:
+                    logger.exception("Command dispatch failed for input: %r", raw)
                     log_activity(self.ctx, f"Command failed: {exc}", "error")
+                finally:
+                    # Any command may have changed branch/commit state
+                    # (or, for /watch and /sync, changed whether sync is
+                    # running) — force the next toolbar render to read
+                    # fresh values instead of serving a stale cache entry.
+                    self._status_cache.invalidate()
                 _sp()
             except KeyboardInterrupt:
                 continue
@@ -720,7 +744,10 @@ class TaskSpinner:
             try:
                 self._st.stop()
             except Exception:
-                pass
+                # Cosmetic terminal cleanup — never worth surfacing to
+                # the user, but logged so a genuinely broken terminal
+                # session leaves a trace somewhere.
+                logger.debug("Spinner stop failed", exc_info=True)
             self._running = False
 
     def __enter__(self) -> "TaskSpinner":
