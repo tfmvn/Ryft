@@ -229,6 +229,41 @@ def log(root: Path, n: int = 10) -> str:
     return _run(["log", f"-{n}", "--oneline", "--decorate"], root, check=False)
 
 
+def graph(root: Path, n: int = 20) -> str:
+    """ASCII commit graph (``git log --graph --oneline --decorate``)."""
+    return _run(
+        ["log", "--graph", "--oneline", "--decorate", f"-{n}"],
+        root, check=False,
+    )
+
+
+def recent_commits(root: Path, n: int = 20) -> list[dict]:
+    """Structured recent commits: [{hash, author, date, subject}, ...]."""
+    try:
+        out = _run(
+            ["log", f"-{n}", "--pretty=format:%h%x1f%an%x1f%ar%x1f%s"],
+            root, check=False,
+        )
+    except GitError:
+        return []
+    commits = []
+    for line in out.splitlines():
+        parts = line.split("\x1f")
+        if len(parts) == 4:
+            commits.append(
+                {"hash": parts[0], "author": parts[1],
+                 "date": parts[2], "subject": parts[3]}
+            )
+    return commits
+
+
+def tags(root: Path) -> list[str]:
+    try:
+        return _run(["tag", "--list"], root, check=False).splitlines()
+    except GitError:
+        return []
+
+
 # ---------------------------------------------------------------------------
 # Status cache
 # ---------------------------------------------------------------------------

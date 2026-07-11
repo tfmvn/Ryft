@@ -187,10 +187,11 @@ def cmd_log(ctx: "AppContext", args: list[str]) -> None:
 
 @register("status", description="Show project + repository status")
 def cmd_status(ctx: "AppContext", args: list[str]) -> None:
-    from .. import ui
+    from ..commands import REGISTRY
+    from ..ui.tui.dashboard import build_dashboard
+    from rich.console import Console
 
-    ui.render_dashboard(ctx)
-    ui.render_git_changes(git.changed_files(ctx.config.root))
+    Console().print(build_dashboard(ctx, list(REGISTRY.values())))
 
 
 _GIT_SUBCOMMANDS = {

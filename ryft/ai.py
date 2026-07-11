@@ -10,17 +10,21 @@ Architecture for speed:
 
 from __future__ import annotations
 
+import asyncio
 import hashlib
 import json
 import os
 import re
 import shutil
 import subprocess
+import threading
 import urllib.error
 import urllib.request
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable
+
+from .providers.base import Message, ProviderError
 
 SUPPORTED_MODELS = [
     "qwen3:0.6b",
@@ -494,3 +498,106 @@ def review_diff(client: OllamaClient, file: str, diff: str) -> str:
         return client.generate(prompt, system=SYSTEM_REVIEW)
     except OllamaError as exc:
         raise OllamaError(f"Review failed: {exc}") from exc
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# Provider-registry helpers (v2) — work with any configured provider, not just
+# local Ollama, and are safe to call from inside the TUI's running event loop.
+# ═══════════════════════════════════════════════════════════════════════════════
+
+def _run_block(coro):
+    """Run a coroutine to completion in a fresh event loop on a worker thread.
+
+    The TUI runs its own asyncio loop on the main thread; calling
+    ``asyncio.run`` there raises. Spawning a dedicated loop+thread sidesteps
+    that and keeps provider ``async`` methods usable everywhere.
+    """
+    box: dict = {}
+
+    def _target() -> None:
+        loop = asyncio.new_event_loop()
+        try:
+            box["value"] = loop.run_until_complete(coro)
+        except BaseException as exc:  # noqa: BLE001 - surface to caller
+            box["error"] = exc
+        finally:
+            loop.close()
+
+    thread = threading.Thread(target=_target)
+    thread.start()
+    thread.join()
+    if "error" in box:
+        raise box["error"]
+    return box["value"]
+
+
+def ask(ctx, prompt: str, *, role: str = "chat", system: str | None = None, **opts) -> str:
+    """Run a single-turn chat through the provider assigned to *role*.
+
+    Returns the assistant text, or raises ``ProviderError`` so callers can
+    show a clean error and fall back gracefully.
+    """
+    provider, model = ctx.provider_for(role)
+    if provider is None:
+        raise ProviderError(f"No provider configured for role '{role}'", kind="unavailable")
+    messages = []
+    if system:
+        messages.append(Message(role="system", content=system))
+    messages.append(Message(role="user", content=prompt))
+    result = _run_block(provider.chat(messages, model=model, **opts))
+    return result.text.strip()
+
+
+def embed_texts(ctx, texts: list[str], *, role: str = "embed") -> list[list[float]]:
+    """Embed *texts* via the `embed` provider role. Returns [] if none."""
+    provider, model = ctx.provider_for(role)
+    if provider is None or not hasattr(provider, "embed"):
+        return []
+    return _run_block(provider.embed(texts, model=model))
+
+
+# ── Context-based commit message (provider registry) ──────────────────────────
+
+def generate_commit_message_ctx(ctx, file: str, diff: str, *, auto_threshold: int = 10) -> tuple[str, str]:
+    """Provider-registry variant of ``generate_commit_message``.
+
+    Returns (message, source) where source ∈ {cache, auto, ollama, fallback}.
+    Uses the `commit` role's provider; falls back to a conventional message
+    if no provider is reachable.
+    """
+    fallback = ctx.config.git.fallback_commit_message.format(file=file)
+    summary, adds, dels = build_commit_summary(file, diff)
+    total = adds + dels
+
+    if diff.strip():
+        cache = _load_cache(ctx.root)
+        key = _diff_hash(diff)
+        if key in cache:
+            return cache[key], "cache"
+
+    if diff.strip() and total <= auto_threshold:
+        msg = _auto_message(file, adds, dels)
+        cache = _load_cache(ctx.root)
+        cache[key] = msg
+        _save_cache(ctx.root, cache)
+        return msg, "auto"
+
+    try:
+        message = ask(
+            ctx,
+            f"{summary}\n\nWrite a one-line conventional commit message for this change.",
+            role="commit",
+            system=SYSTEM_COMMIT_MSG,
+        )
+    except Exception:  # noqa: BLE001 - fall back rather than crash the commit
+        return fallback, "fallback"
+
+    message = re.sub(r"<think>.*?</think>", "", message, flags=re.DOTALL).strip()
+    message = message.strip('"').splitlines()[0] if message else ""
+    if not message:
+        return fallback, "fallback"
+    if diff.strip():
+        cache = _load_cache(ctx.root)
+        cache[_diff_hash(diff)] = message
+        _save_cache(ctx.root, cache)
+    return message, "ollama"

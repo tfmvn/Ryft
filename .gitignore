@@ -30,3 +30,6 @@ Thumbs.db
 .tokens
 .env
 .env.*
+
+# Ryft local cache & data (knowledge db, logs, caches)
+.ryft/

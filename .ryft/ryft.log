@@ -1,0 +1,790 @@
+2026-07-11 09:57:50,914 ERROR    ryft.services.base: service indexer tick failed
+Traceback (most recent call last):
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/base.py", line 53, in _run
+    self.tick()
+    ~~~~~~~~~^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/indexer.py", line 26, in tick
+    self.indexer.index(full=False)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/indexer.py", line 49, in index
+    if full or self.store.file_hash(rel) != result.hash:
+               ~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/store.py", line 122, in file_hash
+    row = self._conn.execute(
+          ~~~~~~~~~~~~~~~~~~^
+        "SELECT hash FROM files WHERE path = ?", (path,)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).fetchone()
+    ^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 139796650720192 and this is thread id 139796376102592.
+2026-07-11 09:57:50,931 ERROR    ryft.core.events: Event handler for git.state.changed failed
+Traceback (most recent call last):
+  File "/mnt/data/Projects/AI/Ryft/ryft/core/events.py", line 85, in emit
+    handler(event)
+    ~~~~~~~^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/manager.py", line 37, in <lambda>
+    "git.state.changed", lambda _e: idx.reindex_now()
+                                    ~~~~~~~~~~~~~~~^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/indexer.py", line 30, in reindex_now
+    return self.indexer.index(full=False)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/indexer.py", line 49, in index
+    if full or self.store.file_hash(rel) != result.hash:
+               ~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/store.py", line 122, in file_hash
+    row = self._conn.execute(
+          ~~~~~~~~~~~~~~~~~~^
+        "SELECT hash FROM files WHERE path = ?", (path,)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).fetchone()
+    ^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 139796650720192 and this is thread id 139796384495296.
+2026-07-11 09:58:02,712 ERROR    ryft.services.base: service indexer tick failed
+Traceback (most recent call last):
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/base.py", line 53, in _run
+    self.tick()
+    ~~~~~~~~~^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/indexer.py", line 26, in tick
+    self.indexer.index(full=False)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/indexer.py", line 49, in index
+    if full or self.store.file_hash(rel) != result.hash:
+               ~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/store.py", line 122, in file_hash
+    row = self._conn.execute(
+          ~~~~~~~~~~~~~~~~~~^
+        "SELECT hash FROM files WHERE path = ?", (path,)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).fetchone()
+    ^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 140535716318144 and this is thread id 140535441786560.
+2026-07-11 09:58:02,734 ERROR    ryft.core.events: Event handler for git.state.changed failed
+Traceback (most recent call last):
+  File "/mnt/data/Projects/AI/Ryft/ryft/core/events.py", line 85, in emit
+    handler(event)
+    ~~~~~~~^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/manager.py", line 37, in <lambda>
+    "git.state.changed", lambda _e: idx.reindex_now()
+                                    ~~~~~~~~~~~~~~~^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/indexer.py", line 30, in reindex_now
+    return self.indexer.index(full=False)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/indexer.py", line 49, in index
+    if full or self.store.file_hash(rel) != result.hash:
+               ~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/store.py", line 122, in file_hash
+    row = self._conn.execute(
+          ~~~~~~~~~~~~~~~~~~^
+        "SELECT hash FROM files WHERE path = ?", (path,)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).fetchone()
+    ^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 140535716318144 and this is thread id 140535450179264.
+2026-07-11 10:00:20,870 ERROR    ryft.services.base: service indexer tick failed
+Traceback (most recent call last):
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/base.py", line 53, in _run
+    self.tick()
+    ~~~~~~~~~^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/indexer.py", line 26, in tick
+    self.indexer.index(full=False)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/indexer.py", line 49, in index
+    if full or self.store.file_hash(rel) != result.hash:
+               ~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/store.py", line 122, in file_hash
+    row = self._conn.execute(
+          ~~~~~~~~~~~~~~~~~~^
+        "SELECT hash FROM files WHERE path = ?", (path,)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).fetchone()
+    ^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 140170926738368 and this is thread id 140170650687168.
+2026-07-11 10:00:20,882 ERROR    ryft.core.events: Event handler for git.state.changed failed
+Traceback (most recent call last):
+  File "/mnt/data/Projects/AI/Ryft/ryft/core/events.py", line 85, in emit
+    handler(event)
+    ~~~~~~~^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/manager.py", line 37, in <lambda>
+    "git.state.changed", lambda _e: idx.reindex_now()
+                                    ~~~~~~~~~~~~~~~^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/indexer.py", line 30, in reindex_now
+    return self.indexer.index(full=False)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/indexer.py", line 49, in index
+    if full or self.store.file_hash(rel) != result.hash:
+               ~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/store.py", line 122, in file_hash
+    row = self._conn.execute(
+          ~~~~~~~~~~~~~~~~~~^
+        "SELECT hash FROM files WHERE path = ?", (path,)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).fetchone()
+    ^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 140170926738368 and this is thread id 140170659079872.
+2026-07-11 10:00:50,876 ERROR    ryft.services.base: service indexer tick failed
+Traceback (most recent call last):
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/base.py", line 53, in _run
+    self.tick()
+    ~~~~~~~~~^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/indexer.py", line 26, in tick
+    self.indexer.index(full=False)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/indexer.py", line 49, in index
+    if full or self.store.file_hash(rel) != result.hash:
+               ~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/store.py", line 122, in file_hash
+    row = self._conn.execute(
+          ~~~~~~~~~~~~~~~~~~^
+        "SELECT hash FROM files WHERE path = ?", (path,)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).fetchone()
+    ^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 140170926738368 and this is thread id 140170650687168.
+2026-07-11 10:01:20,882 ERROR    ryft.services.base: service indexer tick failed
+Traceback (most recent call last):
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/base.py", line 53, in _run
+    self.tick()
+    ~~~~~~~~~^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/indexer.py", line 26, in tick
+    self.indexer.index(full=False)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/indexer.py", line 49, in index
+    if full or self.store.file_hash(rel) != result.hash:
+               ~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/store.py", line 122, in file_hash
+    row = self._conn.execute(
+          ~~~~~~~~~~~~~~~~~~^
+        "SELECT hash FROM files WHERE path = ?", (path,)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).fetchone()
+    ^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 140170926738368 and this is thread id 140170650687168.
+2026-07-11 10:09:22,142 ERROR    ryft.services.base: service indexer tick failed
+Traceback (most recent call last):
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/base.py", line 53, in _run
+    self.tick()
+    ~~~~~~~~~^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/indexer.py", line 26, in tick
+    self.indexer.index(full=False)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/indexer.py", line 49, in index
+    if full or self.store.file_hash(rel) != result.hash:
+               ~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/store.py", line 122, in file_hash
+    row = self._conn.execute(
+          ~~~~~~~~~~~~~~~~~~^
+        "SELECT hash FROM files WHERE path = ?", (path,)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).fetchone()
+    ^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 140235779189696 and this is thread id 140235504674496.
+2026-07-11 10:09:22,155 ERROR    ryft.core.events: Event handler for git.state.changed failed
+Traceback (most recent call last):
+  File "/mnt/data/Projects/AI/Ryft/ryft/core/events.py", line 85, in emit
+    handler(event)
+    ~~~~~~~^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/manager.py", line 37, in <lambda>
+    "git.state.changed", lambda _e: idx.reindex_now()
+                                    ~~~~~~~~~~~~~~~^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/indexer.py", line 30, in reindex_now
+    return self.indexer.index(full=False)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/indexer.py", line 49, in index
+    if full or self.store.file_hash(rel) != result.hash:
+               ~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/store.py", line 122, in file_hash
+    row = self._conn.execute(
+          ~~~~~~~~~~~~~~~~~~^
+        "SELECT hash FROM files WHERE path = ?", (path,)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).fetchone()
+    ^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 140235779189696 and this is thread id 140235513067200.
+2026-07-11 10:09:52,149 ERROR    ryft.services.base: service indexer tick failed
+Traceback (most recent call last):
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/base.py", line 53, in _run
+    self.tick()
+    ~~~~~~~~~^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/indexer.py", line 26, in tick
+    self.indexer.index(full=False)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/indexer.py", line 49, in index
+    if full or self.store.file_hash(rel) != result.hash:
+               ~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/store.py", line 122, in file_hash
+    row = self._conn.execute(
+          ~~~~~~~~~~~~~~~~~~^
+        "SELECT hash FROM files WHERE path = ?", (path,)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).fetchone()
+    ^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 140235779189696 and this is thread id 140235504674496.
+2026-07-11 10:10:22,155 ERROR    ryft.services.base: service indexer tick failed
+Traceback (most recent call last):
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/base.py", line 53, in _run
+    self.tick()
+    ~~~~~~~~~^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/indexer.py", line 26, in tick
+    self.indexer.index(full=False)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/indexer.py", line 49, in index
+    if full or self.store.file_hash(rel) != result.hash:
+               ~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/store.py", line 122, in file_hash
+    row = self._conn.execute(
+          ~~~~~~~~~~~~~~~~~~^
+        "SELECT hash FROM files WHERE path = ?", (path,)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).fetchone()
+    ^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 140235779189696 and this is thread id 140235504674496.
+2026-07-11 10:10:52,161 ERROR    ryft.services.base: service indexer tick failed
+Traceback (most recent call last):
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/base.py", line 53, in _run
+    self.tick()
+    ~~~~~~~~~^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/indexer.py", line 26, in tick
+    self.indexer.index(full=False)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/indexer.py", line 49, in index
+    if full or self.store.file_hash(rel) != result.hash:
+               ~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/store.py", line 122, in file_hash
+    row = self._conn.execute(
+          ~~~~~~~~~~~~~~~~~~^
+        "SELECT hash FROM files WHERE path = ?", (path,)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).fetchone()
+    ^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 140235779189696 and this is thread id 140235504674496.
+2026-07-11 10:11:22,167 ERROR    ryft.services.base: service indexer tick failed
+Traceback (most recent call last):
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/base.py", line 53, in _run
+    self.tick()
+    ~~~~~~~~~^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/indexer.py", line 26, in tick
+    self.indexer.index(full=False)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/indexer.py", line 49, in index
+    if full or self.store.file_hash(rel) != result.hash:
+               ~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/store.py", line 122, in file_hash
+    row = self._conn.execute(
+          ~~~~~~~~~~~~~~~~~~^
+        "SELECT hash FROM files WHERE path = ?", (path,)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).fetchone()
+    ^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 140235779189696 and this is thread id 140235504674496.
+2026-07-11 10:11:52,173 ERROR    ryft.services.base: service indexer tick failed
+Traceback (most recent call last):
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/base.py", line 53, in _run
+    self.tick()
+    ~~~~~~~~~^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/indexer.py", line 26, in tick
+    self.indexer.index(full=False)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/indexer.py", line 49, in index
+    if full or self.store.file_hash(rel) != result.hash:
+               ~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/store.py", line 122, in file_hash
+    row = self._conn.execute(
+          ~~~~~~~~~~~~~~~~~~^
+        "SELECT hash FROM files WHERE path = ?", (path,)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).fetchone()
+    ^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 140235779189696 and this is thread id 140235504674496.
+2026-07-11 10:12:01,536 ERROR    ryft.core.events: Event handler for git.state.changed failed
+Traceback (most recent call last):
+  File "/mnt/data/Projects/AI/Ryft/ryft/core/events.py", line 85, in emit
+    handler(event)
+    ~~~~~~~^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/manager.py", line 37, in <lambda>
+    "git.state.changed", lambda _e: idx.reindex_now()
+                                    ~~~~~~~~~~~~~~~^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/indexer.py", line 30, in reindex_now
+    return self.indexer.index(full=False)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/indexer.py", line 49, in index
+    if full or self.store.file_hash(rel) != result.hash:
+               ~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/store.py", line 122, in file_hash
+    row = self._conn.execute(
+          ~~~~~~~~~~~~~~~~~~^
+        "SELECT hash FROM files WHERE path = ?", (path,)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).fetchone()
+    ^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 140235779189696 and this is thread id 140235513067200.
+2026-07-11 10:12:10,564 ERROR    ryft.core.events: Event handler for git.state.changed failed
+Traceback (most recent call last):
+  File "/mnt/data/Projects/AI/Ryft/ryft/core/events.py", line 85, in emit
+    handler(event)
+    ~~~~~~~^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/manager.py", line 37, in <lambda>
+    "git.state.changed", lambda _e: idx.reindex_now()
+                                    ~~~~~~~~~~~~~~~^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/indexer.py", line 30, in reindex_now
+    return self.indexer.index(full=False)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/indexer.py", line 49, in index
+    if full or self.store.file_hash(rel) != result.hash:
+               ~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/store.py", line 122, in file_hash
+    row = self._conn.execute(
+          ~~~~~~~~~~~~~~~~~~^
+        "SELECT hash FROM files WHERE path = ?", (path,)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).fetchone()
+    ^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 140235779189696 and this is thread id 140235513067200.
+2026-07-11 10:12:22,179 ERROR    ryft.services.base: service indexer tick failed
+Traceback (most recent call last):
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/base.py", line 53, in _run
+    self.tick()
+    ~~~~~~~~~^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/indexer.py", line 26, in tick
+    self.indexer.index(full=False)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/indexer.py", line 49, in index
+    if full or self.store.file_hash(rel) != result.hash:
+               ~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/store.py", line 122, in file_hash
+    row = self._conn.execute(
+          ~~~~~~~~~~~~~~~~~~^
+        "SELECT hash FROM files WHERE path = ?", (path,)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).fetchone()
+    ^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 140235779189696 and this is thread id 140235504674496.
+2026-07-11 10:12:52,185 ERROR    ryft.services.base: service indexer tick failed
+Traceback (most recent call last):
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/base.py", line 53, in _run
+    self.tick()
+    ~~~~~~~~~^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/indexer.py", line 26, in tick
+    self.indexer.index(full=False)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/indexer.py", line 49, in index
+    if full or self.store.file_hash(rel) != result.hash:
+               ~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/store.py", line 122, in file_hash
+    row = self._conn.execute(
+          ~~~~~~~~~~~~~~~~~~^
+        "SELECT hash FROM files WHERE path = ?", (path,)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).fetchone()
+    ^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 140235779189696 and this is thread id 140235504674496.
+2026-07-11 10:13:22,191 ERROR    ryft.services.base: service indexer tick failed
+Traceback (most recent call last):
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/base.py", line 53, in _run
+    self.tick()
+    ~~~~~~~~~^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/indexer.py", line 26, in tick
+    self.indexer.index(full=False)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/indexer.py", line 49, in index
+    if full or self.store.file_hash(rel) != result.hash:
+               ~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/store.py", line 122, in file_hash
+    row = self._conn.execute(
+          ~~~~~~~~~~~~~~~~~~^
+        "SELECT hash FROM files WHERE path = ?", (path,)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).fetchone()
+    ^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 140235779189696 and this is thread id 140235504674496.
+2026-07-11 10:13:52,196 ERROR    ryft.services.base: service indexer tick failed
+Traceback (most recent call last):
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/base.py", line 53, in _run
+    self.tick()
+    ~~~~~~~~~^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/indexer.py", line 26, in tick
+    self.indexer.index(full=False)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/indexer.py", line 49, in index
+    if full or self.store.file_hash(rel) != result.hash:
+               ~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/store.py", line 122, in file_hash
+    row = self._conn.execute(
+          ~~~~~~~~~~~~~~~~~~^
+        "SELECT hash FROM files WHERE path = ?", (path,)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).fetchone()
+    ^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 140235779189696 and this is thread id 140235504674496.
+2026-07-11 10:14:19,324 ERROR    ryft.services.base: service indexer tick failed
+Traceback (most recent call last):
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/base.py", line 53, in _run
+    self.tick()
+    ~~~~~~~~~^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/indexer.py", line 26, in tick
+    self.indexer.index(full=False)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/indexer.py", line 49, in index
+    if full or self.store.file_hash(rel) != result.hash:
+               ~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/store.py", line 122, in file_hash
+    row = self._conn.execute(
+          ~~~~~~~~~~~~~~~~~~^
+        "SELECT hash FROM files WHERE path = ?", (path,)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).fetchone()
+    ^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 139941802769344 and this is thread id 139941528262336.
+2026-07-11 10:14:19,336 ERROR    ryft.core.events: Event handler for git.state.changed failed
+Traceback (most recent call last):
+  File "/mnt/data/Projects/AI/Ryft/ryft/core/events.py", line 85, in emit
+    handler(event)
+    ~~~~~~~^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/manager.py", line 37, in <lambda>
+    "git.state.changed", lambda _e: idx.reindex_now()
+                                    ~~~~~~~~~~~~~~~^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/indexer.py", line 30, in reindex_now
+    return self.indexer.index(full=False)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/indexer.py", line 49, in index
+    if full or self.store.file_hash(rel) != result.hash:
+               ~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/store.py", line 122, in file_hash
+    row = self._conn.execute(
+          ~~~~~~~~~~~~~~~~~~^
+        "SELECT hash FROM files WHERE path = ?", (path,)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).fetchone()
+    ^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 139941802769344 and this is thread id 139941536655040.
+2026-07-11 10:14:49,331 ERROR    ryft.services.base: service indexer tick failed
+Traceback (most recent call last):
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/base.py", line 53, in _run
+    self.tick()
+    ~~~~~~~~~^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/indexer.py", line 26, in tick
+    self.indexer.index(full=False)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/indexer.py", line 49, in index
+    if full or self.store.file_hash(rel) != result.hash:
+               ~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/store.py", line 122, in file_hash
+    row = self._conn.execute(
+          ~~~~~~~~~~~~~~~~~~^
+        "SELECT hash FROM files WHERE path = ?", (path,)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).fetchone()
+    ^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 139941802769344 and this is thread id 139941528262336.
+2026-07-11 10:15:19,337 ERROR    ryft.services.base: service indexer tick failed
+Traceback (most recent call last):
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/base.py", line 53, in _run
+    self.tick()
+    ~~~~~~~~~^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/indexer.py", line 26, in tick
+    self.indexer.index(full=False)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/indexer.py", line 49, in index
+    if full or self.store.file_hash(rel) != result.hash:
+               ~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/store.py", line 122, in file_hash
+    row = self._conn.execute(
+          ~~~~~~~~~~~~~~~~~~^
+        "SELECT hash FROM files WHERE path = ?", (path,)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).fetchone()
+    ^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 139941802769344 and this is thread id 139941528262336.
+2026-07-11 10:15:49,343 ERROR    ryft.services.base: service indexer tick failed
+Traceback (most recent call last):
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/base.py", line 53, in _run
+    self.tick()
+    ~~~~~~~~~^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/indexer.py", line 26, in tick
+    self.indexer.index(full=False)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/indexer.py", line 49, in index
+    if full or self.store.file_hash(rel) != result.hash:
+               ~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/store.py", line 122, in file_hash
+    row = self._conn.execute(
+          ~~~~~~~~~~~~~~~~~~^
+        "SELECT hash FROM files WHERE path = ?", (path,)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).fetchone()
+    ^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 139941802769344 and this is thread id 139941528262336.
+2026-07-11 10:16:19,348 ERROR    ryft.services.base: service indexer tick failed
+Traceback (most recent call last):
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/base.py", line 53, in _run
+    self.tick()
+    ~~~~~~~~~^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/indexer.py", line 26, in tick
+    self.indexer.index(full=False)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/indexer.py", line 49, in index
+    if full or self.store.file_hash(rel) != result.hash:
+               ~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/store.py", line 122, in file_hash
+    row = self._conn.execute(
+          ~~~~~~~~~~~~~~~~~~^
+        "SELECT hash FROM files WHERE path = ?", (path,)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).fetchone()
+    ^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 139941802769344 and this is thread id 139941528262336.
+2026-07-11 10:16:49,354 ERROR    ryft.services.base: service indexer tick failed
+Traceback (most recent call last):
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/base.py", line 53, in _run
+    self.tick()
+    ~~~~~~~~~^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/indexer.py", line 26, in tick
+    self.indexer.index(full=False)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/indexer.py", line 49, in index
+    if full or self.store.file_hash(rel) != result.hash:
+               ~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/store.py", line 122, in file_hash
+    row = self._conn.execute(
+          ~~~~~~~~~~~~~~~~~~^
+        "SELECT hash FROM files WHERE path = ?", (path,)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).fetchone()
+    ^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 139941802769344 and this is thread id 139941528262336.
+2026-07-11 10:17:19,360 ERROR    ryft.services.base: service indexer tick failed
+Traceback (most recent call last):
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/base.py", line 53, in _run
+    self.tick()
+    ~~~~~~~~~^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/indexer.py", line 26, in tick
+    self.indexer.index(full=False)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/indexer.py", line 49, in index
+    if full or self.store.file_hash(rel) != result.hash:
+               ~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/store.py", line 122, in file_hash
+    row = self._conn.execute(
+          ~~~~~~~~~~~~~~~~~~^
+        "SELECT hash FROM files WHERE path = ?", (path,)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).fetchone()
+    ^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 139941802769344 and this is thread id 139941528262336.
+2026-07-11 10:17:49,366 ERROR    ryft.services.base: service indexer tick failed
+Traceback (most recent call last):
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/base.py", line 53, in _run
+    self.tick()
+    ~~~~~~~~~^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/indexer.py", line 26, in tick
+    self.indexer.index(full=False)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/indexer.py", line 49, in index
+    if full or self.store.file_hash(rel) != result.hash:
+               ~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/store.py", line 122, in file_hash
+    row = self._conn.execute(
+          ~~~~~~~~~~~~~~~~~~^
+        "SELECT hash FROM files WHERE path = ?", (path,)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).fetchone()
+    ^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 139941802769344 and this is thread id 139941528262336.
+2026-07-11 10:18:19,372 ERROR    ryft.services.base: service indexer tick failed
+Traceback (most recent call last):
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/base.py", line 53, in _run
+    self.tick()
+    ~~~~~~~~~^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/indexer.py", line 26, in tick
+    self.indexer.index(full=False)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/indexer.py", line 49, in index
+    if full or self.store.file_hash(rel) != result.hash:
+               ~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/store.py", line 122, in file_hash
+    row = self._conn.execute(
+          ~~~~~~~~~~~~~~~~~~^
+        "SELECT hash FROM files WHERE path = ?", (path,)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).fetchone()
+    ^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 139941802769344 and this is thread id 139941528262336.
+2026-07-11 10:18:49,377 ERROR    ryft.services.base: service indexer tick failed
+Traceback (most recent call last):
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/base.py", line 53, in _run
+    self.tick()
+    ~~~~~~~~~^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/indexer.py", line 26, in tick
+    self.indexer.index(full=False)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/indexer.py", line 49, in index
+    if full or self.store.file_hash(rel) != result.hash:
+               ~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/store.py", line 122, in file_hash
+    row = self._conn.execute(
+          ~~~~~~~~~~~~~~~~~~^
+        "SELECT hash FROM files WHERE path = ?", (path,)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).fetchone()
+    ^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 139941802769344 and this is thread id 139941528262336.
+2026-07-11 10:19:19,383 ERROR    ryft.services.base: service indexer tick failed
+Traceback (most recent call last):
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/base.py", line 53, in _run
+    self.tick()
+    ~~~~~~~~~^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/indexer.py", line 26, in tick
+    self.indexer.index(full=False)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/indexer.py", line 49, in index
+    if full or self.store.file_hash(rel) != result.hash:
+               ~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/store.py", line 122, in file_hash
+    row = self._conn.execute(
+          ~~~~~~~~~~~~~~~~~~^
+        "SELECT hash FROM files WHERE path = ?", (path,)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).fetchone()
+    ^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 139941802769344 and this is thread id 139941528262336.
+2026-07-11 10:19:49,389 ERROR    ryft.services.base: service indexer tick failed
+Traceback (most recent call last):
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/base.py", line 53, in _run
+    self.tick()
+    ~~~~~~~~~^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/indexer.py", line 26, in tick
+    self.indexer.index(full=False)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/indexer.py", line 49, in index
+    if full or self.store.file_hash(rel) != result.hash:
+               ~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/store.py", line 122, in file_hash
+    row = self._conn.execute(
+          ~~~~~~~~~~~~~~~~~~^
+        "SELECT hash FROM files WHERE path = ?", (path,)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).fetchone()
+    ^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 139941802769344 and this is thread id 139941528262336.
+2026-07-11 10:20:19,395 ERROR    ryft.services.base: service indexer tick failed
+Traceback (most recent call last):
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/base.py", line 53, in _run
+    self.tick()
+    ~~~~~~~~~^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/indexer.py", line 26, in tick
+    self.indexer.index(full=False)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/indexer.py", line 49, in index
+    if full or self.store.file_hash(rel) != result.hash:
+               ~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/store.py", line 122, in file_hash
+    row = self._conn.execute(
+          ~~~~~~~~~~~~~~~~~~^
+        "SELECT hash FROM files WHERE path = ?", (path,)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).fetchone()
+    ^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 139941802769344 and this is thread id 139941528262336.
+2026-07-11 10:20:50,910 ERROR    ryft.services.base: service indexer tick failed
+Traceback (most recent call last):
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/base.py", line 53, in _run
+    self.tick()
+    ~~~~~~~~~^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/indexer.py", line 26, in tick
+    self.indexer.index(full=False)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/indexer.py", line 49, in index
+    if full or self.store.file_hash(rel) != result.hash:
+               ~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/store.py", line 122, in file_hash
+    row = self._conn.execute(
+          ~~~~~~~~~~~~~~~~~~^
+        "SELECT hash FROM files WHERE path = ?", (path,)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).fetchone()
+    ^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 139958456421312 and this is thread id 139958181893824.
+2026-07-11 10:20:50,943 ERROR    ryft.core.events: Event handler for git.state.changed failed
+Traceback (most recent call last):
+  File "/mnt/data/Projects/AI/Ryft/ryft/core/events.py", line 85, in emit
+    handler(event)
+    ~~~~~~~^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/manager.py", line 37, in <lambda>
+    "git.state.changed", lambda _e: idx.reindex_now()
+                                    ~~~~~~~~~~~~~~~^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/indexer.py", line 30, in reindex_now
+    return self.indexer.index(full=False)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/indexer.py", line 49, in index
+    if full or self.store.file_hash(rel) != result.hash:
+               ~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/store.py", line 122, in file_hash
+    row = self._conn.execute(
+          ~~~~~~~~~~~~~~~~~~^
+        "SELECT hash FROM files WHERE path = ?", (path,)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).fetchone()
+    ^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 139958456421312 and this is thread id 139958190286528.
+2026-07-11 10:20:56,969 ERROR    ryft.core.events: Event handler for git.state.changed failed
+Traceback (most recent call last):
+  File "/mnt/data/Projects/AI/Ryft/ryft/core/events.py", line 85, in emit
+    handler(event)
+    ~~~~~~~^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/manager.py", line 37, in <lambda>
+    "git.state.changed", lambda _e: idx.reindex_now()
+                                    ~~~~~~~~~~~~~~~^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/indexer.py", line 30, in reindex_now
+    return self.indexer.index(full=False)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/indexer.py", line 49, in index
+    if full or self.store.file_hash(rel) != result.hash:
+               ~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/store.py", line 122, in file_hash
+    row = self._conn.execute(
+          ~~~~~~~~~~~~~~~~~~^
+        "SELECT hash FROM files WHERE path = ?", (path,)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).fetchone()
+    ^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 139958456421312 and this is thread id 139958190286528.
+2026-07-11 10:21:06,015 ERROR    ryft.core.events: Event handler for git.state.changed failed
+Traceback (most recent call last):
+  File "/mnt/data/Projects/AI/Ryft/ryft/core/events.py", line 85, in emit
+    handler(event)
+    ~~~~~~~^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/manager.py", line 37, in <lambda>
+    "git.state.changed", lambda _e: idx.reindex_now()
+                                    ~~~~~~~~~~~~~~~^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/indexer.py", line 30, in reindex_now
+    return self.indexer.index(full=False)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/indexer.py", line 49, in index
+    if full or self.store.file_hash(rel) != result.hash:
+               ~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/store.py", line 122, in file_hash
+    row = self._conn.execute(
+          ~~~~~~~~~~~~~~~~~~^
+        "SELECT hash FROM files WHERE path = ?", (path,)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).fetchone()
+    ^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 139958456421312 and this is thread id 139958190286528.
+2026-07-11 10:21:20,917 ERROR    ryft.services.base: service indexer tick failed
+Traceback (most recent call last):
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/base.py", line 53, in _run
+    self.tick()
+    ~~~~~~~~~^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/services/indexer.py", line 26, in tick
+    self.indexer.index(full=False)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/indexer.py", line 49, in index
+    if full or self.store.file_hash(rel) != result.hash:
+               ~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/mnt/data/Projects/AI/Ryft/ryft/knowledge/store.py", line 122, in file_hash
+    row = self._conn.execute(
+          ~~~~~~~~~~~~~~~~~~^
+        "SELECT hash FROM files WHERE path = ?", (path,)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).fetchone()
+    ^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 139958456421312 and this is thread id 139958181893824.

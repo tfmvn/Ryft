@@ -127,4 +127,4 @@ def dispatch_argv(ctx: "AppContext", argv: list[str]) -> None:
 
 # ── Side-effect imports: each module below calls register() for the ────────
 # commands it owns. Order doesn't matter — see REGISTRY docstring above.
-from . import commit, sync, doctor, config, format, ai, help  # noqa: E402,F401
+from . import commit, sync, doctor, config, format, ai, help, insight, system  # noqa: E402,F401
